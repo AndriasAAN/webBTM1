@@ -1,3 +1,106 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "carousel-1",
+      "description": "Scenic view of Batumarta 1 village.",
+      "imageUrl": "https://images.unsplash.com/photo-1620038971384-687616512702?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHx2aWxsYWdlJTIwbGFuZHNjYXBlfGVufDB8fHx8MTc2NTI1MTAwMnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "village landscape"
+    },
+    {
+      "id": "carousel-2",
+      "description": "Community gathering in Batumarta 1.",
+      "imageUrl": "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxjb21tdW5pdHklMjBldmVudHxlbnwwfHx8fDE3NjUzMzM1MzN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "community event"
+    },
+    {
+      "id": "carousel-3",
+      "description": "Local craftsmanship of Batumarta 1.",
+      "imageUrl": "https://images.unsplash.com/photo-1512676052261-98bab4919138?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxsb2NhbCUyMGNyYWZ0fGVufDB8fHx8MTc2NTI1OTYxNHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "local craft"
+    },
+    {
+      "id": "news-1",
+      "description": "Thumbnail for a news article about village development.",
+      "imageUrl": "https://images.unsplash.com/photo-1639309527384-02fec9eff92a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHx2aWxsYWdlJTIwZGV2ZWxvcG1lbnR8ZW58MHx8fHwxNzY1MzMzNTMzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "village development"
+    },
+    {
+      "id": "news-2",
+      "description": "Thumbnail for a news article about a cultural festival.",
+      "imageUrl": "https://images.unsplash.com/photo-1765248227873-386be7d14ec5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8Y3VsdHVyYWwlMjBmZXN0aXZhbHxlbnwwfHx8fDE3NjUyNzEzMzV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "cultural festival"
+    },
+    {
+      "id": "news-3",
+      "description": "Thumbnail for a news article about youth sports.",
+      "imageUrl": "https://images.unsplash.com/photo-1604651684549-962bd68d7c5c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHx5b3V0aCUyMHNwb3J0c3xlbnwwfHx8fDE3NjUzMzM1MzN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "youth sports"
+    },
+    {
+      "id": "news-default",
+      "description": "Default thumbnail for news articles.",
+      "imageUrl": "https://images.unsplash.com/photo-1585241936939-be4099591252?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxuZXdzJTIwYXJ0aWNsZXxlbnwwfHx8fDE3NjUzMzM1MzN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "news article"
+    },
+    {
+      "id": "gallery-1",
+      "description": "A beautiful sunset over the village fields.",
+      "imageUrl": "https://images.unsplash.com/photo-1558645746-95f4f651e58a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxzdW5zZXQlMjBmaWVsZHN8ZW58MHx8fHwxNzY1MzMzNTM0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "sunset fields"
+    },
+    {
+      "id": "gallery-2",
+      "description": "Children playing in the village square.",
+      "imageUrl": "https://images.unsplash.com/photo-1533222481259-ce20eda1e20b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxjaGlsZHJlbiUyMHBsYXlpbmd8ZW58MHx8fHwxNzY1MzMwNjMyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "children playing"
+    },
+    {
+      "id": "gallery-3",
+      "description": "Traditional market day in Batumarta 1.",
+      "imageUrl": "https://images.unsplash.com/photo-1669824739095-93db107cfa42?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtYXJrZXQlMjBkYXl8ZW58MHx8fHwxNzY1MzMzNTMzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "market day"
+    },
+    {
+      "id": "gallery-4",
+      "description": "A close-up of local produce.",
+      "imageUrl": "https://images.unsplash.com/photo-1659122053424-c45ac3bc276b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxsb2NhbCUyMHByb2R1Y2V8ZW58MHx8fHwxNzY1MzMzNTM0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "local produce"
+    },
+    {
+      "id": "gallery-5",
+      "description": "The main village office building.",
+      "imageUrl": "https://images.unsplash.com/photo-1574958269340-fa927503f3dd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxvZmZpY2UlMjBidWlsZGluZ3xlbnwwfHx8fDE3NjUzMDA0ODJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "office building"
+    },
+    {
+      "id": "gallery-6",
+      "description": "A celebration with fireworks.",
+      "imageUrl": "https://images.unsplash.com/photo-1642498496883-56a096f98e8b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxjZWxlYnJhdGlvbiUyMGZpcmV3b3Jrc3xlbnwwfHx8fDE3NjUzMzM1MzR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "celebration fireworks"
+    },
+    {
+      "id": "profile-head",
+      "description": "Photo of the village head.",
+      "imageUrl": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxwZXJzb24lMjBwb3J0cmFpdHxlbnwwfHx8fDE3NjUyNDQyOTZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "profile-secretary",
+      "description": "Photo of the village secretary.",
+      "imageUrl": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxwZXJzb24lMjBwb3J0cmFpdHxlbnwwfHx8fDE3NjUyNDQyOTZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "profile-treasurer",
+      "description": "Photo of the village treasurer.",
+      "imageUrl": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxwZXJzb24lMjBwb3J0cmFpdHxlbnwwfHx8fDE3NjUyNDQyOTZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "default-header",
+      "description": "Default header image for the homepage.",
+      "imageUrl": "https://images.unsplash.com/photo-1745594223981-05025c675ae1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHx2aWxsYWdlJTIwbGFuZHNjYXBlfGVufDB8fHx8MTc2NTI1MTAwMnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "village landscape"
+    }
+  ]
 }

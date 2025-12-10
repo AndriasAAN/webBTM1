@@ -1,0 +1,68 @@
+'use client';
+
+import { useState } from 'react';
+import Image from 'next/image';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Card, CardContent } from '@/components/ui/card';
+import type { GalleryPhoto } from '@/lib/types';
+import { Maximize } from 'lucide-react';
+
+interface PhotoGridProps {
+  photos: GalleryPhoto[];
+}
+
+export function PhotoGrid({ photos }: PhotoGridProps) {
+  const [selectedImage, setSelectedImage] = useState<GalleryPhoto | null>(null);
+
+  return (
+    <>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {photos.map((photo) => (
+          <Card
+            key={photo.id}
+            className="overflow-hidden cursor-pointer group relative"
+            onClick={() => setSelectedImage(photo)}
+          >
+            <CardContent className="p-0 aspect-w-1 aspect-h-1">
+              <Image
+                src={photo.url}
+                alt={photo.name || 'Gallery photo'}
+                fill
+                className="object-cover transform transition-transform duration-300 group-hover:scale-110"
+                sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              />
+              <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Maximize className="w-8 h-8 text-white" />
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
+        <DialogContent className="max-w-4xl p-2">
+          {selectedImage && (
+            <>
+            <DialogHeader className="p-4 absolute top-0 left-0 z-10">
+                <DialogTitle className="text-white drop-shadow-md">{selectedImage.name}</DialogTitle>
+            </DialogHeader>
+            <div className="relative aspect-video">
+                <Image
+                    src={selectedImage.url}
+                    alt={selectedImage.name || 'Selected gallery photo'}
+                    fill
+                    className="object-contain"
+                />
+            </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
