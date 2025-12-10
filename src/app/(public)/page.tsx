@@ -8,47 +8,57 @@ import type { GalleryPhoto, NewsArticle, SiteSettings } from '@/lib/types';
 import { ArrowRight, Info, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
-import { collection, limit, orderBy, query } from 'firebase/firestore';
+import { useCollection, useDoc, useFirestore, useMemoFirebase } from '@/firebase';
+import { collection, limit, orderBy, query, where, doc } from 'firebase/firestore';
 import { LatestNews } from '@/components/home/LatestNews';
+import { Skeleton } from '@/components/ui/skeleton';
 
-
-// This part remains a mock, as it was not part of the requested change.
-// It can be migrated to Firebase later.
-function getSiteSettings(): SiteSettings {
-  const defaultHeaderImage = PlaceHolderImages.find(p => p.id === 'default-header');
-  return {
-    tagline: 'Membangun Bersama, Sejahtera Bersama',
-    headerImageUrl: defaultHeaderImage?.imageUrl || 'https://picsum.photos/seed/header/1600/500',
-    themeColor: 'light-pink',
-  };
-}
-
-function getSliderPhotos(): GalleryPhoto[] {
-  const carouselIds = ['carousel-1', 'carousel-2', 'carousel-3'];
-  const photos = PlaceHolderImages.filter(p => carouselIds.includes(p.id));
-  return photos.map(p => ({
-    id: p.id,
-    url: p.imageUrl,
-    isSlider: true,
-    createdAt: new Date(),
-    name: p.description
-  }));
+function HomePageSkeleton() {
+  return (
+    <>
+      <Skeleton className="w-full h-[50vh] md:h-[calc(100vh-4rem)]" />
+      <section className="py-16 lg:py-24">
+        <div className="container text-center max-w-3xl mx-auto">
+          <Skeleton className="h-10 md:h-14 w-3/4 mx-auto mb-4" />
+          <Skeleton className="h-10 md:h-14 w-1/2 mx-auto" />
+          <div className="mt-6 space-y-2">
+            <Skeleton className="h-5 w-full" />
+            <Skeleton className="h-5 w-5/6 mx-auto" />
+          </div>
+        </div>
+      </section>
+      <section className="bg-muted py-16 lg:py-24">
+        <div className="container">
+          <div className="text-center mb-12">
+            <Skeleton className="h-10 w-64 mx-auto mb-2" />
+            <Skeleton className="h-5 w-80 mx-auto" />
+          </div>
+          <LatestNews.Skeleton />
+        </div>
+      </section>
+    </>
+  );
 }
 
 
 export default function HomePage() {
   const firestore = useFirestore();
 
-  const [settings, setSettings] = useState<SiteSettings | null>(null);
-  const [sliderPhotos, setSliderPhotos] = useState<GalleryPhoto[]>([]);
-
-  useEffect(() => {
-    // Fetch mock data on the client
-    setSettings(getSiteSettings());
-    setSliderPhotos(getSliderPhotos());
-  }, []);
+  // Fetch Site Settings
+  const settingsRef = useMemoFirebase(() => 
+    firestore ? doc(firestore, 'website_settings', 'default') : null,
+    [firestore]
+  );
+  const { data: settings, isLoading: isSettingsLoading } = useDoc<SiteSettings>(settingsRef);
+  
+  // Fetch Slider Photos
+  const sliderPhotosQuery = useMemoFirebase(() => 
+    firestore 
+      ? query(collection(firestore, 'gallery_photos'), where('isSlider', '==', true), limit(5)) 
+      : null,
+    [firestore]
+  );
+  const { data: sliderPhotos, isLoading: isPhotosLoading } = useCollection<GalleryPhoto>(sliderPhotosQuery);
 
   const latestNewsQuery = useMemoFirebase(() => 
     firestore 
@@ -58,13 +68,30 @@ export default function HomePage() {
   );
   const { data: latestNews, isLoading: isNewsLoading } = useCollection<NewsArticle>(latestNewsQuery);
 
-  if (!settings || sliderPhotos.length === 0) {
-      return <div>Loading...</div>; // Or a proper skeleton loader
+  if (isSettingsLoading || isPhotosLoading) {
+      return <HomePageSkeleton />;
   }
+  
+  const finalSettings = settings || {
+      tagline: 'Membangun Bersama, Sejahtera Bersama',
+      headerImageUrl: PlaceHolderImages.find(p => p.id === 'default-header')?.imageUrl || 'https://picsum.photos/seed/header/1600/500',
+      themeColor: 'light-pink',
+  };
+
+  const finalSliderPhotos = sliderPhotos && sliderPhotos.length > 0
+    ? sliderPhotos
+    : [{
+        id: 'default-slider',
+        url: finalSettings.headerImageUrl,
+        isSlider: true,
+        createdAt: new Date(),
+        name: 'Selamat Datang di Desa Batumarta 1'
+    }];
+
 
   return (
     <>
-      <HeroCarousel photos={sliderPhotos} tagline={settings.tagline} />
+      <HeroCarousel photos={finalSliderPhotos} tagline={finalSettings.tagline} />
       <section className="py-16 lg:py-24">
         <div className="container">
           <div className="text-center max-w-3xl mx-auto">

@@ -6,6 +6,7 @@ export interface NewsArticle {
   content: string;
   thumbnailUrl: string;
   createdAt: Timestamp | Date;
+  updatedAt: Timestamp | Date;
 }
 
 export interface GalleryPhoto {

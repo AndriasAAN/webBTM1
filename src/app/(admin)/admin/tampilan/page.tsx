@@ -19,28 +19,37 @@ import {
 } from '@/components/ui/select';
 import { Loader2, Save, Upload } from 'lucide-react';
 import Image from 'next/image';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import type { SiteSettings } from '@/lib/types';
-
-// Mock data. Replace with actual Firebase data fetching.
-const currentSettings: SiteSettings = {
-    tagline: 'Membangun Bersama, Sejahtera Bersama',
-    headerImageUrl: PlaceHolderImages.find(p => p.id === 'default-header')?.imageUrl || '',
-    themeColor: 'light-pink',
-};
-
+import { useFirebase, useDoc, useMemoFirebase } from '@/firebase';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 export default function AdminTampilanPage() {
   const { toast } = useToast();
   const router = useRouter();
+  const { firestore, firebaseApp } = useFirebase();
+  const storage = getStorage(firebaseApp);
+
+  const settingsRef = useMemoFirebase(() => firestore ? doc(firestore, 'website_settings', 'default') : null, [firestore]);
+  const { data: currentSettings, isLoading: isLoadingSettings } = useDoc<SiteSettings>(settingsRef);
+
   const [isLoading, setIsLoading] = useState(false);
-  const [tagline, setTagline] = useState(currentSettings.tagline);
-  const [themeColor, setThemeColor] = useState(currentSettings.themeColor);
-  const [headerImagePreview, setHeaderImagePreview] = useState<string | null>(currentSettings.headerImageUrl);
+  const [tagline, setTagline] = useState('');
+  const [themeColor, setThemeColor] = useState<SiteSettings['themeColor']>('light-pink');
+  const [headerImagePreview, setHeaderImagePreview] = useState<string | null>(null);
   const [headerImageFile, setHeaderImageFile] = useState<File | null>(null);
+
+  useEffect(() => {
+    if (currentSettings) {
+      setTagline(currentSettings.tagline);
+      setThemeColor(currentSettings.themeColor);
+      setHeaderImagePreview(currentSettings.headerImageUrl);
+    }
+  }, [currentSettings]);
+
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -56,20 +65,49 @@ export default function AdminTampilanPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!firestore) {
+      toast({ variant: "destructive", title: "Error", description: "Koneksi database gagal." });
+      return;
+    }
     setIsLoading(true);
 
-    // Mocking async operation
-    setTimeout(() => {
-      console.log('Saving data:', { tagline, themeColor, headerImageFile });
+    try {
+      let headerImageUrl = currentSettings?.headerImageUrl || '';
+
+      if (headerImageFile) {
+        const storageRef = ref(storage, `site_settings/header_${Date.now()}_${headerImageFile.name}`);
+        const uploadResult = await uploadBytes(storageRef, headerImageFile);
+        headerImageUrl = await getDownloadURL(uploadResult.ref);
+      }
+
+      const settingsData: SiteSettings = {
+        tagline,
+        themeColor,
+        headerImageUrl,
+      };
+
+      await setDoc(doc(firestore, 'website_settings', 'default'), settingsData, { merge: true });
+      
       toast({
         title: 'Berhasil Disimpan',
         description: 'Perubahan tampilan telah disimpan.',
       });
+      router.refresh();
+    } catch (error) {
+       console.error("Error saving settings: ", error);
+        toast({
+            variant: "destructive",
+            title: "Gagal Menyimpan",
+            description: "Terjadi kesalahan saat menyimpan pengaturan. Silakan coba lagi.",
+        });
+    } finally {
       setIsLoading(false);
-      // router.refresh(); // To see changes if they were real
-    }, 1500);
+    }
   };
 
+  if (isLoadingSettings) {
+    return <div>Memuat pengaturan...</div>
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8 max-w-3xl">
@@ -112,6 +150,9 @@ export default function AdminTampilanPage() {
                     <Input id="dropzone-file" type="file" className="hidden" accept="image/png, image/jpeg" onChange={handleImageChange} />
                 </label>
             </div>
+             <p className="text-sm text-muted-foreground">
+              Gambar ini akan menjadi gambar utama jika tidak ada foto yang ditandai sebagai 'slider'.
+            </p>
           </div>
           
           <div className="space-y-2">
