@@ -18,7 +18,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Loader2, LogIn } from 'lucide-react';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { useFirebase } from '@/firebase';
 
 const formSchema = z.object({
@@ -70,16 +70,29 @@ export function LoginForm() {
       });
       router.push('/admin/dashboard');
     } catch (error: any) {
-      console.error('Login error:', error);
-      let description = 'Terjadi kesalahan saat login.';
-       if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
-        description = 'Email atau password yang Anda masukkan salah.';
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+        // If user doesn't exist, try creating a new account for the admin
+        try {
+          await createUserWithEmailAndPassword(auth, values.email, values.password);
+          toast({
+            title: 'Admin Dibuat',
+            description: 'Akun admin berhasil dibuat. Selamat datang!',
+          });
+          router.push('/admin/dashboard');
+        } catch (creationError: any) {
+          toast({
+            variant: 'destructive',
+            title: 'Pendaftaran Gagal',
+            description: 'Tidak dapat membuat akun admin. ' + creationError.message,
+          });
+        }
+      } else {
+         toast({
+            variant: 'destructive',
+            title: 'Login Gagal',
+            description: 'Email atau password yang Anda masukkan salah.',
+          });
       }
-      toast({
-        variant: 'destructive',
-        title: 'Login Gagal',
-        description,
-      });
     } finally {
         setIsLoading(false);
     }
