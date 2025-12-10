@@ -1,116 +1,54 @@
-/**
- * Core Philosophy: This ruleset enforces a strict role-based access control (RBAC) model.
- * Public users can read publicly available content like news and photos, but all write
- * operations (create, update, delete) are restricted to authenticated users who are
- * designated as administrators.
- *
- * Data Structure: The data is organized into flat, top-level collections. Authorization
- * is managed by a dedicated `/roles_admin` collection, where the existence of a
- * document with a user's UID signifies admin privileges.
- *
- * Key Security Decisions:
- * - Admin Role Check: All write permissions for content collections depend on a single,
- *   performant check to the `/roles_admin` collection.
- * - Public Read, Admin Write: The `news_articles`, `gallery_photos`, and `website_settings` collections are
- *   publicly readable by anyone but can only be modified by admins.
- * - Admin-Only Management: The `roles_admin` collections are
- *   fully locked down, allowing read and write access only to administrators. This
- *   prevents non-admins from viewing sensitive settings or discovering the identities
- *   of other admins.
- * - Prototyping Flexibility: These rules do not enforce specific data schemas. This
- *   allows developers to iterate quickly on the data model without being blocked by
- *   strict validation, while maintaining strong authorization security.
- */
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // -------------------------------------------------------------------------
-    // Helper Functions
-    // -------------------------------------------------------------------------
-
     /**
-     * Checks if the user is authenticated.
-     */
-    function isSignedIn() {
-      return request.auth != null;
-    }
-
-    /**
-     * Checks if the user is an administrator.
-     * Admin status is granted if a document with the user's UID exists in the
-     * /roles_admin collection.
+     * Helper function to check if the authenticated user is the designated admin.
+     * @returns {boolean} True if the user's email is the admin email.
      */
     function isAdmin() {
-      return isSignedIn() && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
+      return request.auth != null && request.auth.token.email == "asse181086@gmail.com";
     }
 
     /**
-     * Confirms a document exists before an update or delete operation.
-     * This is a critical check to ensure rules are not bypassed on non-existent paths.
+     * @description Stores website settings. Publicly readable, but write access
+     *              is restricted to the administrator.
+     * @path /website_settings/{docId}
      */
-    function isExistingDoc() {
-      return resource != null;
+    match /website_settings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
     }
 
-    // -------------------------------------------------------------------------
-    // Collection Rules
-    // -------------------------------------------------------------------------
-
     /**
-     * @description Stores news articles. Publicly readable by anyone, but only
-     *              administrators can create, modify, or delete articles.
-     * @path /news_articles/{newsArticleId}
-     * @allow (get) Any user, signed in or not, can read a news article.
-     * @deny (create) A non-administrative user attempts to create a new article.
-     * @principle Implements a "Public Read with Admin-Only Writes" pattern.
+     * @description Stores news articles. Publicly readable, but write access
+     *              is restricted to the administrator.
+     * @path /news_articles/{docId}
      */
-    match /news_articles/{newsArticleId} {
-      allow get, list: if true;
-      allow create: if isAdmin();
-      allow update, delete: if isAdmin() && isExistingDoc();
+    match /news_articles/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
     }
 
     /**
-     * @description Stores gallery photos. Publicly readable, but can only be managed
-     *              by administrators.
-     * @path /gallery_photos/{galleryPhotoId}
-     * @allow (list) Any user, signed in or not, can list all gallery photos.
-     * @deny (delete) An authenticated, non-admin user attempts to delete a photo.
-     * @principle Implements a "Public Read with Admin-Only Writes" pattern.
+     * @description Stores gallery photos. Publicly readable, but write access
+     *              is restricted to the administrator.
+     * @path /gallery_photos/{docId}
      */
-    match /gallery_photos/{galleryPhotoId} {
-      allow get, list: if true;
-      allow create: if isAdmin();
-      allow update, delete: if isAdmin() && isExistingDoc();
+    match /gallery_photos/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
     }
-
+    
     /**
-     * @description Stores website settings like theme and header images. Publicly readable,
-     *              but write access is restricted to administrators.
-     * @path /website_settings/{websiteSettingId}
-     * @allow (get) An unauthenticated user reads the website's tagline.
-     * @deny (update) A regular signed-in user tries to update the settings document.
-     * @principle Enforces strict admin-only access for sensitive configuration data.
-     */
-    match /website_settings/{websiteSettingId} {
-      allow get, list: if true;
-      allow create: if isAdmin();
-      allow update, delete: if isAdmin() && isExistingDoc();
-    }
-
-    /**
-     * @description Manages admin roles. The existence of a document grants admin rights.
-     *              Only existing admins can view or manage other admin roles.
+     * @description Manages admin roles. Only the designated admin can manage this collection.
+     *              This collection is currently not used for authorization in favor of the
+     *              hardcoded admin email, but the rule is kept for potential future use.
      * @path /roles_admin/{userId}
-     * @allow (create) An existing admin grants admin rights to another user.
-     * @deny (list) A non-admin user attempts to list all admins.
-     * @principle Secures the authorization system itself by restricting access to admins.
      */
     match /roles_admin/{userId} {
-      allow get, list: if isAdmin();
-      allow create: if isAdmin();
-      allow update, delete: if isAdmin() && isExistingDoc();
+      allow read, write: if isAdmin();
     }
   }
 }
