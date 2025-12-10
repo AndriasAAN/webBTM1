@@ -1,0 +1,173 @@
+{
+  "entities": {
+    "NewsArticle": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "NewsArticle",
+      "type": "object",
+      "description": "Represents a news article for the Batumarta 1 website.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the news article."
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the news article."
+        },
+        "date": {
+          "type": "string",
+          "description": "Date of the news article.",
+          "format": "date-time"
+        },
+        "content": {
+          "type": "string",
+          "description": "Content of the news article (rich text)."
+        },
+        "thumbnailUrl": {
+          "type": "string",
+          "description": "URL of the thumbnail image for the news article.",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "date",
+        "content",
+        "thumbnailUrl"
+      ]
+    },
+    "GalleryPhoto": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "GalleryPhoto",
+      "type": "object",
+      "description": "Represents a photo in the website's gallery.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the gallery photo."
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "URL of the image in the gallery.",
+          "format": "uri"
+        },
+        "isSliderImage": {
+          "type": "boolean",
+          "description": "Indicates if the photo is used in the homepage slider."
+        }
+      },
+      "required": [
+        "id",
+        "imageUrl",
+        "isSliderImage"
+      ]
+    },
+    "WebsiteSetting": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "WebsiteSetting",
+      "type": "object",
+      "description": "Represents customizable settings for the website's front end.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the website settings (e.g., 'default')."
+        },
+        "headerImageUrl": {
+          "type": "string",
+          "description": "URL of the header image on the homepage.",
+          "format": "uri"
+        },
+        "tagline": {
+          "type": "string",
+          "description": "Greeting text / tagline displayed on the homepage."
+        },
+        "themeColor": {
+          "type": "string",
+          "description": "Selected theme color for the website (e.g., 'pink muda', 'pink cerah', 'rose pink')."
+        }
+      },
+      "required": [
+        "id",
+        "headerImageUrl",
+        "tagline",
+        "themeColor"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/news_articles/{newsArticleId}",
+        "definition": {
+          "entityName": "NewsArticle",
+          "schema": {
+            "$ref": "#/backend/entities/NewsArticle"
+          },
+          "description": "Stores news articles. Only admins can create, update, or delete articles. Publicly readable.",
+          "params": [
+            {
+              "name": "newsArticleId",
+              "description": "Unique identifier for the news article."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/gallery_photos/{galleryPhotoId}",
+        "definition": {
+          "entityName": "GalleryPhoto",
+          "schema": {
+            "$ref": "#/backend/entities/GalleryPhoto"
+          },
+          "description": "Stores gallery photos. Only admins can create, update, or delete photos. Publicly readable.",
+          "params": [
+            {
+              "name": "galleryPhotoId",
+              "description": "Unique identifier for the gallery photo."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/website_settings/{websiteSettingId}",
+        "definition": {
+          "entityName": "WebsiteSetting",
+          "schema": {
+            "$ref": "#/backend/entities/WebsiteSetting"
+          },
+          "description": "Stores website settings. Only admins can update settings.",
+          "params": [
+            {
+              "name": "websiteSettingId",
+              "description": "Unique identifier for the website settings (e.g., 'default')."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/roles_admin/{userId}",
+        "definition": {
+          "entityName": "user",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Collection to store admin roles. If a document exists with the user's ID, the user is considered an admin.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The UID of the user with admin privileges."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore data structure is designed to support the Batumarta 1 Digital Hub application, focusing on news management, photo gallery, website customization, and secure admin access. The structure emphasizes authorization independence and clear security rules. \n\n**Authorization Independence:** Authorization independence is achieved by storing all authorization information directly within the documents that require protection. In this design, we leverage the `roles_admin` collection for administrative access. The Firestore rules check for the existence of a document with the user's UID in the `roles_admin` collection, which authorizes admin actions. This avoids complex `get()` calls and ensures atomic operations.\n\n**Structural Segregation (Homogeneous Security Posture):** Data with different access requirements are stored in separate collections. News articles and gallery photos, which are publicly readable but only editable by admins, are stored in the `news_articles` and `gallery_photos` collections, respectively. Website settings, which are exclusively for admin access, are stored in the `website_settings` collection.\n\n**Access Modeling:** The design follows consistent access modeling patterns:\n\n*   **Global Roles (DBAC):** The `roles_admin` collection grants admin privileges based on document existence. A user with a document in this collection is considered an admin.\n\n**QAPs Support:** The design supports QAPs (Rules Are Not Filters) by enabling secure `list` operations. Publicly readable data (news articles, gallery photos) can be listed without complex filtering in the rules. Admin-only data (website settings) are protected by existence checks in the `roles_admin` collection.\n\n**Invariants:** The structure supports data integrity by enforcing strict rules on data creation, modification, and deletion. For example, only admins can create, update, or delete news articles and gallery photos."
+  }
+}
