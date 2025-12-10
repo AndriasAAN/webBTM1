@@ -1,19 +1,22 @@
 'use client';
 import { HeroCarousel } from '@/components/home/HeroCarousel';
-import { LatestNews } from '@/components/home/LatestNews';
+import { NewsCard } from '@/components/berita/NewsCard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { GalleryPhoto, NewsArticle, SiteSettings } from '@/lib/types';
+import type { GalleryPhoto, NewsArticle, SiteSettings } from '@/lib/types';
 import { ArrowRight, Info, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Suspense } from 'react';
-import { useCollection, useDoc, useFirestore, useMemoFirebase } from '@/firebase';
-import { collection, doc, limit, orderBy, query } from 'firebase/firestore';
+import { useEffect, useState } from 'react';
+import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { collection, limit, orderBy, query } from 'firebase/firestore';
+import { LatestNews } from '@/components/home/LatestNews';
 
 
-async function getSiteSettings(): Promise<SiteSettings> {
+// This part remains a mock, as it was not part of the requested change.
+// It can be migrated to Firebase later.
+function getSiteSettings(): SiteSettings {
   const defaultHeaderImage = PlaceHolderImages.find(p => p.id === 'default-header');
   return {
     tagline: 'Membangun Bersama, Sejahtera Bersama',
@@ -22,7 +25,7 @@ async function getSiteSettings(): Promise<SiteSettings> {
   };
 }
 
-async function getSliderPhotos(): Promise<GalleryPhoto[]> {
+function getSliderPhotos(): GalleryPhoto[] {
   const carouselIds = ['carousel-1', 'carousel-2', 'carousel-3'];
   const photos = PlaceHolderImages.filter(p => carouselIds.includes(p.id));
   return photos.map(p => ({
@@ -34,8 +37,18 @@ async function getSliderPhotos(): Promise<GalleryPhoto[]> {
   }));
 }
 
-function HomePageContent({ sliderPhotos, settings }: { sliderPhotos: GalleryPhoto[], settings: SiteSettings }) {
+
+export default function HomePage() {
   const firestore = useFirestore();
+
+  const [settings, setSettings] = useState<SiteSettings | null>(null);
+  const [sliderPhotos, setSliderPhotos] = useState<GalleryPhoto[]>([]);
+
+  useEffect(() => {
+    // Fetch mock data on the client
+    setSettings(getSiteSettings());
+    setSliderPhotos(getSliderPhotos());
+  }, []);
 
   const latestNewsQuery = useMemoFirebase(() => 
     firestore 
@@ -44,6 +57,10 @@ function HomePageContent({ sliderPhotos, settings }: { sliderPhotos: GalleryPhot
     [firestore]
   );
   const { data: latestNews, isLoading: isNewsLoading } = useCollection<NewsArticle>(latestNewsQuery);
+
+  if (!settings || sliderPhotos.length === 0) {
+      return <div>Loading...</div>; // Or a proper skeleton loader
+  }
 
   return (
     <>
@@ -136,24 +153,3 @@ function HomePageContent({ sliderPhotos, settings }: { sliderPhotos: GalleryPhot
     </>
   )
 }
-
-
-export default function HomePage() {
-  // These are still using mock data as they are not the focus of the change.
-  // We can migrate them to Firebase in a separate step if needed.
-  const settingsPromise = getSiteSettings();
-  const sliderPhotosPromise = getSliderPhotos();
-
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <PageContentLoader settingsPromise={settingsPromise} sliderPhotosPromise={sliderPhotosPromise} />
-    </Suspense>
-  );
-}
-
-async function PageContentLoader({ settingsPromise, sliderPhotosPromise }: { settingsPromise: Promise<SiteSettings>, sliderPhotosPromise: Promise<GalleryPhoto[]> }) {
-  const settings = await settingsPromise;
-  const sliderPhotos = await sliderPhotosPromise;
-  return <HomePageContent settings={settings} sliderPhotos={sliderPhotos} />;
-}
-
