@@ -11,10 +11,10 @@ export interface NewsArticle {
 
 export interface GalleryPhoto {
   id: string;
+  name: string;
   url: string;
   isSlider: boolean;
-  createdAt: Timestamp | Date;
-  name: string;
+  createdAt?: Timestamp | Date;
 }
 
 export interface SiteSettings {

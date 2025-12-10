@@ -7,6 +7,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import { Card, CardContent } from '@/components/ui/card';
 import type { GalleryPhoto } from '@/lib/types';
@@ -39,19 +40,22 @@ export function PhotoGrid({ photos }: PhotoGridProps) {
               <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                   <Maximize className="w-8 h-8 text-white" />
               </div>
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">
+                <p className="text-white text-sm truncate">{photo.name}</p>
+              </div>
             </CardContent>
           </Card>
         ))}
       </div>
 
       <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
-        <DialogContent className="max-w-4xl p-2">
+        <DialogContent className="max-w-4xl p-2 bg-transparent border-none shadow-none">
           {selectedImage && (
             <>
-            <DialogHeader className="p-4 absolute top-0 left-0 z-10">
+            <DialogHeader className="p-4 absolute bottom-0 left-0 z-10 w-full bg-gradient-to-t from-black/80 to-transparent">
                 <DialogTitle className="text-white drop-shadow-md">{selectedImage.name}</DialogTitle>
             </DialogHeader>
-            <div className="relative aspect-video">
+            <div className="relative aspect-video w-full h-auto">
                 <Image
                     src={selectedImage.url}
                     alt={selectedImage.name || 'Selected gallery photo'}
