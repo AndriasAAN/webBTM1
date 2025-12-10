@@ -29,7 +29,7 @@ async function getNewsArticle(articleId: string): Promise<NewsArticle | null> {
   return {
     ...foundArticle,
     thumbnailUrl: placeholder!.imageUrl,
-    createdAt: new Date() as any,
+    createdAt: new Date(),
   };
 }
 
@@ -55,8 +55,9 @@ export default async function BeritaDetailPage({ params }: { params: { id: strin
     notFound();
   }
 
-  const formattedDate = format(article.createdAt.toDate(), 'EEEE, dd MMMM yyyy', { locale: id });
-  const formattedTime = format(article.createdAt.toDate(), 'HH:mm', { locale: id });
+  const articleDate = article.createdAt as Date;
+  const formattedDate = format(articleDate, 'EEEE, dd MMMM yyyy', { locale: id });
+  const formattedTime = format(articleDate, 'HH:mm', { locale: id });
 
   return (
     <div className="bg-background">

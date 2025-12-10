@@ -39,7 +39,7 @@ async function getGalleryPhotos(): Promise<GalleryPhoto[]> {
     id: p.id,
     url: p.imageUrl,
     isSlider: p.id.startsWith('carousel'),
-    createdAt: new Date() as any,
+    createdAt: new Date(),
     name: p.description,
   }));
 }
@@ -100,7 +100,7 @@ export default async function AdminGaleriPage() {
                   </TableCell>
                   <TableCell className="font-medium max-w-xs truncate">{photo.name}</TableCell>
                   <TableCell className="hidden md:table-cell">
-                    {format(photo.createdAt.toDate(), 'dd MMMM yyyy', { locale: id })}
+                    {format(photo.createdAt as Date, 'dd MMMM yyyy', { locale: id })}
                   </TableCell>
                   <TableCell>
                       <Switch

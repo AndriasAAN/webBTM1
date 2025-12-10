@@ -11,7 +11,7 @@ async function getGalleryPhotos(): Promise<GalleryPhoto[]> {
     id: p.id,
     url: p.imageUrl,
     isSlider: false,
-    createdAt: new Date() as any,
+    createdAt: new Date(),
     name: p.description,
   }));
 }

@@ -15,7 +15,7 @@ async function getNewsArticle(id: string): Promise<NewsArticle | null> {
     return {
       ...item,
       thumbnailUrl: placeholder!.imageUrl,
-      createdAt: new Date() as any,
+      createdAt: new Date(),
     };
 }
 

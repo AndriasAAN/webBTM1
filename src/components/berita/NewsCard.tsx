@@ -13,14 +13,23 @@ import { Button } from '../ui/button';
 import { ArrowRight, CalendarDays } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
+import { Timestamp } from 'firebase/firestore';
 
 interface NewsCardProps {
   article: NewsArticle;
 }
 
 export function NewsCard({ article }: NewsCardProps) {
+  const getDate = () => {
+    if (!article.createdAt) return new Date();
+    if (article.createdAt instanceof Timestamp) {
+      return article.createdAt.toDate();
+    }
+    return article.createdAt;
+  }
+
   const formattedDate = article.createdAt
-    ? format(article.createdAt.toDate(), 'dd MMMM yyyy', { locale: id })
+    ? format(getDate(), 'dd MMMM yyyy', { locale: id })
     : 'Tanggal tidak tersedia';
 
   const excerpt = article.content.substring(0, 100) + (article.content.length > 100 ? '...' : '');

@@ -5,14 +5,14 @@ export interface NewsArticle {
   title: string;
   content: string;
   thumbnailUrl: string;
-  createdAt: Timestamp;
+  createdAt: Timestamp | Date;
 }
 
 export interface GalleryPhoto {
   id: string;
   url: string;
   isSlider: boolean;
-  createdAt: Timestamp;
+  createdAt: Timestamp | Date;
   name: string;
 }
 

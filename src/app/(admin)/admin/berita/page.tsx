@@ -47,7 +47,7 @@ async function getNews(): Promise<NewsArticle[]> {
       title: item.title,
       content: item.content,
       thumbnailUrl: placeholder!.imageUrl,
-      createdAt: new Date() as any,
+      createdAt: new Date(),
     };
   });
 }
@@ -110,7 +110,7 @@ export default async function AdminBeritaPage() {
                   </TableCell>
                   <TableCell className="font-medium">{article.title}</TableCell>
                   <TableCell className="hidden md:table-cell">
-                    {format(article.createdAt.toDate(), 'dd MMMM yyyy', { locale: id })}
+                    {format(article.createdAt as Date, 'dd MMMM yyyy', { locale: id })}
                   </TableCell>
                   <TableCell>
                     <DropdownMenu>

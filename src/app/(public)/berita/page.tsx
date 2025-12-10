@@ -21,7 +21,7 @@ async function getAllNews(): Promise<NewsArticle[]> {
       title: item.title,
       content: item.content,
       thumbnailUrl: placeholder!.imageUrl,
-      createdAt: new Date() as any,
+      createdAt: new Date(),
     };
   });
 }

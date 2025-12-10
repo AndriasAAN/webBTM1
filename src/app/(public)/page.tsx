@@ -27,7 +27,7 @@ async function getSliderPhotos(): Promise<GalleryPhoto[]> {
     id: p.id,
     url: p.imageUrl,
     isSlider: true,
-    createdAt: new Date() as any,
+    createdAt: new Date(),
     name: p.description
   }));
 }
@@ -46,7 +46,7 @@ async function getLatestNews(): Promise<NewsArticle[]> {
       title: item.title,
       content: item.content,
       thumbnailUrl: placeholder?.imageUrl || PlaceHolderImages.find(p => p.id === 'news-default')!.imageUrl,
-      createdAt: new Date() as any,
+      createdAt: new Date(),
     };
   });
 }
