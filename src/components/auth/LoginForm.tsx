@@ -16,10 +16,9 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
 import { useState } from 'react';
 import { Loader2, LogIn } from 'lucide-react';
+import { signInWithEmailAndPassword } from '@/lib/firebase';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Format email tidak valid.' }),
@@ -52,7 +51,7 @@ export function LoginForm() {
     }
 
     try {
-      await signInWithEmailAndPassword(auth, values.email, values.password);
+      await signInWithEmailAndPassword(values.email, values.password);
       toast({
         title: 'Login Berhasil',
         description: 'Selamat datang, Admin!',
@@ -61,7 +60,7 @@ export function LoginForm() {
     } catch (error: any) {
       console.error('Login error:', error);
       let description = 'Terjadi kesalahan saat login.';
-      if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+       if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential' || error.code === 'auth/invalid-api-key' || error.code === 'auth/api-key-not-valid.-please-pass-a-valid-api-key..') {
         description = 'Email atau password yang Anda masukkan salah.';
       }
       toast({

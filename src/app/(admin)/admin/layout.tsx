@@ -2,8 +2,8 @@
 
 import { ReactNode, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { onAuthStateChanged, User } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import type { User } from 'firebase/auth';
+import { auth, onAuthStateChanged } from '@/lib/firebase';
 import { AdminNav } from '@/components/admin/AdminNav';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -14,7 +14,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged((currentUser: User | null) => {
       if (currentUser && currentUser.email === 'asse181086@gmail.com') {
         setUser(currentUser);
       } else {
