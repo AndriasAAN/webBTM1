@@ -4,11 +4,11 @@ import { Badge } from '@/components/ui/badge';
 import { doc, getDoc, Timestamp } from 'firebase/firestore';
 import type { NewsArticle } from '@/lib/types';
 import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
+import { id as localeId } from 'date-fns/locale';
 import { Calendar, Clock, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFirestore } from '@/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -36,17 +36,18 @@ function BeritaDetailSkeleton() {
   )
 }
 
-export default function BeritaDetailPage({ params }: { params: { id: string } }) {
+export default function BeritaDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = React.use(params);
   const firestore = useFirestore();
   const [article, setArticle] = useState<NewsArticle | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!firestore || !params.id) return;
+    if (!firestore || !id) return;
 
     const fetchArticle = async () => {
       setLoading(true);
-      const docRef = doc(firestore, 'news_articles', params.id);
+      const docRef = doc(firestore, 'news_articles', id);
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
@@ -58,7 +59,7 @@ export default function BeritaDetailPage({ params }: { params: { id: string } })
     };
 
     fetchArticle();
-  }, [firestore, params.id]);
+  }, [firestore, id]);
 
 
   if (loading) {
@@ -71,8 +72,8 @@ export default function BeritaDetailPage({ params }: { params: { id: string } })
   }
   
   const articleDate = (article.createdAt as Timestamp).toDate();
-  const formattedDate = format(articleDate, 'EEEE, dd MMMM yyyy', { locale: id });
-  const formattedTime = format(articleDate, 'HH:mm', { locale: id });
+  const formattedDate = format(articleDate, 'EEEE, dd MMMM yyyy', { locale: localeId });
+  const formattedTime = format(articleDate, 'HH:mm', { locale: localeId });
 
   return (
     <div className="bg-background">

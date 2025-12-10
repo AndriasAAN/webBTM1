@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { Skeleton } from '@/components/ui/skeleton';
+import React from 'react';
 
 function EditBeritaSkeleton() {
     return (
@@ -34,9 +35,10 @@ function EditBeritaSkeleton() {
 }
 
 
-export default function EditBeritaPage({ params }: { params: { id: string } }) {
+export default function EditBeritaPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = React.use(params);
     const firestore = useFirestore();
-    const articleRef = useMemoFirebase(() => firestore ? doc(firestore, 'news_articles', params.id) : null, [firestore, params.id]);
+    const articleRef = useMemoFirebase(() => firestore ? doc(firestore, 'news_articles', id) : null, [firestore, id]);
     const { data: article, isLoading, error } = useDoc<NewsArticle>(articleRef);
     const router = useRouter();
 
