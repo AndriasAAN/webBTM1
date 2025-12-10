@@ -35,7 +35,7 @@ export default function GaleriPage() {
         <div className="container text-center">
           <h1 className="text-4xl font-bold tracking-tight">Galeri Foto</h1>
           <p className="mt-2 text-lg text-muted-foreground max-w-2xl mx-auto">
-            Momen dan keindahan Desa Batumarta 1 yang terekam dalam gambar.
+            Desa Batumarta 1 dalam Foto / Tangkapan Layar
           </p>
         </div>
       </header>
