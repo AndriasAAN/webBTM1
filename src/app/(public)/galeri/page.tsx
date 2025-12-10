@@ -1,28 +1,30 @@
-import { PhotoGrid } from '@/components/galeri/PhotoGrid';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
-import type { GalleryPhoto } from '@/lib/types';
+'use client';
 
-// Mock function to get all gallery photos. Replace with actual Firebase call.
-async function getGalleryPhotos(): Promise<GalleryPhoto[]> {
-  const photoIds = ['gallery-1', 'gallery-2', 'gallery-3', 'gallery-4', 'gallery-5', 'gallery-6'];
-  const photos = PlaceHolderImages.filter(p => photoIds.includes(p.id));
-  
-  return photos.map(p => ({
-    id: p.id,
-    url: p.imageUrl,
-    isSlider: false,
-    createdAt: new Date(),
-    name: p.description,
-  }));
+import { PhotoGrid } from '@/components/galeri/PhotoGrid';
+import type { GalleryPhoto } from '@/lib/types';
+import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { collection, query, orderBy } from 'firebase/firestore';
+import { Skeleton } from '@/components/ui/skeleton';
+
+function GallerySkeleton() {
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      {Array.from({ length: 8 }).map((_, i) => (
+        <Skeleton key={i} className="aspect-square w-full rounded-lg" />
+      ))}
+    </div>
+  )
 }
 
-export const metadata = {
-  title: 'Galeri - Desa Batumarta 1',
-  description: 'Dokumentasi foto kegiatan dan keindahan Desa Batumarta 1.',
-};
-
-export default async function GaleriPage() {
-  const photos = await getGalleryPhotos();
+export default function GaleriPage() {
+  const firestore = useFirestore();
+  const photosQuery = useMemoFirebase(() => 
+    firestore 
+      ? query(collection(firestore, 'gallery_photos'), orderBy('createdAt', 'desc')) 
+      : null,
+    [firestore]
+  );
+  const { data: photos, isLoading } = useCollection<GalleryPhoto>(photosQuery);
 
   return (
     <>
@@ -36,7 +38,9 @@ export default async function GaleriPage() {
       </header>
       <main className="py-16">
         <div className="container">
-          {photos.length > 0 ? (
+          {isLoading ? (
+            <GallerySkeleton />
+          ) : photos && photos.length > 0 ? (
             <PhotoGrid photos={photos} />
           ) : (
              <div className="text-center py-16 border rounded-lg">
