@@ -18,7 +18,8 @@ import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Loader2, LogIn } from 'lucide-react';
-import { signInWithEmailAndPassword } from '@/lib/firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { useFirebase } from '@/firebase';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Format email tidak valid.' }),
@@ -29,6 +30,7 @@ export function LoginForm() {
   const { toast } = useToast();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const { auth } = useFirebase();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -40,6 +42,16 @@ export function LoginForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
+    if (!auth) {
+        toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Layanan autentikasi tidak tersedia.",
+        });
+        setIsLoading(false);
+        return;
+    }
+    
     if (values.email !== 'asse181086@gmail.com') {
       toast({
         variant: 'destructive',
@@ -51,7 +63,7 @@ export function LoginForm() {
     }
 
     try {
-      await signInWithEmailAndPassword(values.email, values.password);
+      await signInWithEmailAndPassword(auth, values.email, values.password);
       toast({
         title: 'Login Berhasil',
         description: 'Selamat datang, Admin!',
@@ -60,7 +72,7 @@ export function LoginForm() {
     } catch (error: any) {
       console.error('Login error:', error);
       let description = 'Terjadi kesalahan saat login.';
-       if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential' || error.code === 'auth/invalid-api-key' || error.code === 'auth/api-key-not-valid.-please-pass-a-valid-api-key..') {
+       if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
         description = 'Email atau password yang Anda masukkan salah.';
       }
       toast({
@@ -68,7 +80,8 @@ export function LoginForm() {
         title: 'Login Gagal',
         description,
       });
-      setIsLoading(false);
+    } finally {
+        setIsLoading(false);
     }
   }
 

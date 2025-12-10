@@ -2,36 +2,32 @@
 
 import { ReactNode, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import type { User } from 'firebase/auth';
-import { auth, onAuthStateChanged } from '@/lib/firebase';
+import { useAuth, useUser } from '@/firebase';
 import { AdminNav } from '@/components/admin/AdminNav';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { signOut } from 'firebase/auth';
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, isUserLoading, userError } = useUser();
+  const auth = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged((currentUser: User | null) => {
-      if (currentUser && currentUser.email === 'asse181086@gmail.com') {
-        setUser(currentUser);
-      } else {
-        router.replace('/login');
-      }
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, [router]);
+    // If auth state is determined and there's no user, or user is not the admin, redirect.
+    if (!isUserLoading && (user?.email !== 'asse181086@gmail.com')) {
+      router.replace('/login');
+    }
+  }, [user, isUserLoading, router]);
   
   const handleLogout = async () => {
-    await auth.signOut();
+    if (auth) {
+      await signOut(auth);
+    }
     router.push('/');
   };
 
-  if (loading) {
+  if (isUserLoading || !user) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -39,10 +35,11 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       </div>
     );
   }
-
-  if (!user) {
-    return null; // Redirect is handled in useEffect
+  
+  if (user.email !== 'asse181086@gmail.com') {
+      return null;
   }
+
 
   return (
     <div className="flex min-h-screen bg-muted/40">
