@@ -3,7 +3,6 @@ import { HeroCarousel } from '@/components/home/HeroCarousel';
 import { NewsCard } from '@/components/berita/NewsCard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import type { GalleryPhoto, NewsArticle, SiteSettings } from '@/lib/types';
 import { ArrowRight, Info, Sparkles } from 'lucide-react';
 import Image from 'next/image';
@@ -12,6 +11,7 @@ import { useCollection, useDoc, useFirestore, useMemoFirebase } from '@/firebase
 import { collection, limit, orderBy, query, where, doc } from 'firebase/firestore';
 import { LatestNews } from '@/components/home/LatestNews';
 import { Skeleton } from '@/components/ui/skeleton';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 function HomePageSkeleton() {
   return (
