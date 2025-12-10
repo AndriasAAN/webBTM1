@@ -17,19 +17,26 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { useEffect, useState } from 'react';
-import { Loader2, Image as ImageIcon } from 'lucide-react';
+import { useState } from 'react';
+import { Loader2, Image as ImageIcon, CalendarIcon } from 'lucide-react';
 import type { NewsArticle } from '@/lib/types';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useFirebase } from '@/firebase';
-import { addDoc, collection, doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, serverTimestamp, setDoc, Timestamp } from 'firebase/firestore';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import { cn } from '@/lib/utils';
+import { Calendar } from '../ui/calendar';
+import { format } from 'date-fns';
 
 
 const formSchema = z.object({
   title: z.string().min(10, { message: 'Judul minimal 10 karakter.' }).max(100, { message: 'Judul maksimal 100 karakter.'}),
   content: z.string().min(50, { message: 'Isi berita minimal 50 karakter.' }),
   thumbnailUrl: z.string().url({ message: 'URL gambar tidak valid.' }).optional().or(z.literal('')),
+  createdAt: z.date({
+    required_error: "Tanggal publikasi harus diisi.",
+  }),
 });
 
 interface NewsFormProps {
@@ -43,12 +50,21 @@ export function NewsForm({ article }: NewsFormProps) {
   
   const [isLoading, setIsLoading] = useState(false);
 
+  const getArticleDate = () => {
+    if (!article?.createdAt) return new Date();
+    if (article.createdAt instanceof Timestamp) {
+      return article.createdAt.toDate();
+    }
+    return article.createdAt;
+  }
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: article?.title || '',
       content: article?.content || '',
       thumbnailUrl: article?.thumbnailUrl || '',
+      createdAt: article ? getArticleDate() : new Date(),
     },
   });
 
@@ -72,20 +88,15 @@ export function NewsForm({ article }: NewsFormProps) {
             content: values.content,
             thumbnailUrl: finalThumbnailUrl,
             updatedAt: serverTimestamp(),
+            createdAt: values.createdAt, // Use date from form
         };
 
         if (article) {
             const docRef = doc(firestore, 'news_articles', article.id);
-            await setDoc(docRef, {
-                ...articleData,
-                createdAt: article.createdAt
-            }, { merge: true });
+            await setDoc(docRef, articleData, { merge: true });
         } else {
             const collectionRef = collection(firestore, 'news_articles');
-            await addDoc(collectionRef, {
-                ...articleData,
-                createdAt: serverTimestamp(),
-            });
+            await addDoc(collectionRef, articleData);
         }
         
         toast({
@@ -156,9 +167,50 @@ export function NewsForm({ article }: NewsFormProps) {
         <div className="space-y-6">
             <Card>
                  <CardHeader>
-                    <CardTitle>Thumbnail</CardTitle>
+                    <CardTitle>Pengaturan Publikasi</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                    <FormField
+                        control={form.control}
+                        name="createdAt"
+                        render={({ field }) => (
+                            <FormItem className="flex flex-col">
+                            <FormLabel>Tanggal Publikasi</FormLabel>
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                <FormControl>
+                                    <Button
+                                    variant={"outline"}
+                                    className={cn(
+                                        "w-full pl-3 text-left font-normal",
+                                        !field.value && "text-muted-foreground"
+                                    )}
+                                    >
+                                    {field.value ? (
+                                        format(field.value, "PPP")
+                                    ) : (
+                                        <span>Pilih tanggal</span>
+                                    )}
+                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                    </Button>
+                                </FormControl>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0" align="start">
+                                <Calendar
+                                    mode="single"
+                                    selected={field.value}
+                                    onSelect={field.onChange}
+                                    disabled={(date) =>
+                                    date > new Date() || date < new Date("1900-01-01")
+                                    }
+                                    initialFocus
+                                />
+                                </PopoverContent>
+                            </Popover>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                        />
                      <FormField
                         control={form.control}
                         name="thumbnailUrl"
