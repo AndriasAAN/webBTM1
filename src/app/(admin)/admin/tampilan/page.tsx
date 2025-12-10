@@ -17,51 +17,37 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Loader2, Save, Upload } from 'lucide-react';
+import { Loader2, Save, Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import type { SiteSettings } from '@/lib/types';
 import { useFirebase, useDoc, useMemoFirebase } from '@/firebase';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
 
 export default function AdminTampilanPage() {
   const { toast } = useToast();
   const router = useRouter();
-  const { firestore, firebaseApp } = useFirebase();
-  const storage = getStorage(firebaseApp);
+  const { firestore } = useFirebase();
 
   const settingsRef = useMemoFirebase(() => firestore ? doc(firestore, 'website_settings', 'default') : null, [firestore]);
   const { data: currentSettings, isLoading: isLoadingSettings } = useDoc<SiteSettings>(settingsRef);
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [tagline, setTagline] = useState('');
   const [themeColor, setThemeColor] = useState<SiteSettings['themeColor']>('light-pink');
-  const [headerImagePreview, setHeaderImagePreview] = useState<string | null>(null);
-  const [headerImageFile, setHeaderImageFile] = useState<File | null>(null);
+  const [headerImageUrl, setHeaderImageUrl] = useState('');
+
 
   useEffect(() => {
     if (currentSettings) {
       setTagline(currentSettings.tagline);
       setThemeColor(currentSettings.themeColor);
-      setHeaderImagePreview(currentSettings.headerImageUrl);
+      setHeaderImageUrl(currentSettings.headerImageUrl);
     }
   }, [currentSettings]);
 
-
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setHeaderImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-      setHeaderImageFile(file);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -69,17 +55,9 @@ export default function AdminTampilanPage() {
       toast({ variant: "destructive", title: "Error", description: "Koneksi database gagal." });
       return;
     }
-    setIsLoading(true);
+    setIsSaving(true);
 
     try {
-      let headerImageUrl = currentSettings?.headerImageUrl || '';
-
-      if (headerImageFile) {
-        const storageRef = ref(storage, `site_settings/header_${Date.now()}_${headerImageFile.name}`);
-        const uploadResult = await uploadBytes(storageRef, headerImageFile);
-        headerImageUrl = await getDownloadURL(uploadResult.ref);
-      }
-
       const settingsData: SiteSettings = {
         tagline,
         themeColor,
@@ -101,7 +79,7 @@ export default function AdminTampilanPage() {
             description: "Terjadi kesalahan saat menyimpan pengaturan. Silakan coba lagi.",
         });
     } finally {
-      setIsLoading(false);
+      setIsSaving(false);
     }
   };
 
@@ -135,20 +113,19 @@ export default function AdminTampilanPage() {
           </div>
 
           <div className="space-y-2">
-            <Label>Gambar Header</Label>
-            <div className="flex flex-col items-center justify-center w-full">
-                <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer bg-muted hover:bg-muted/80 relative">
-                    {headerImagePreview ? (
-                        <Image src={headerImagePreview} alt="Preview" layout="fill" className="object-cover rounded-lg" />
-                    ) : (
-                        <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center">
-                            <Upload className="w-8 h-8 mb-4 text-muted-foreground" />
-                            <p className="mb-2 text-sm text-muted-foreground"><span className="font-semibold">Klik untuk ganti gambar</span></p>
-                            <p className="text-xs text-muted-foreground">Rekomendasi ukuran: 1600x500px</p>
-                        </div>
-                    )}
-                    <Input id="dropzone-file" type="file" className="hidden" accept="image/png, image/jpeg" onChange={handleImageChange} />
-                </label>
+            <Label htmlFor="header-image-url">URL Gambar Header</Label>
+            <Input id="header-image-url" value={headerImageUrl} onChange={(e) => setHeaderImageUrl(e.target.value)} placeholder="https://..." />
+             <div className="mt-2 border-2 border-dashed rounded-lg p-4 bg-muted">
+                <div className="w-full aspect-video relative flex items-center justify-center">
+                {headerImageUrl ? (
+                    <Image src={headerImageUrl} alt="Preview" layout="fill" className="object-contain rounded-md" />
+                ) : (
+                    <div className="text-center text-muted-foreground">
+                        <ImageIcon className="mx-auto h-10 w-10"/>
+                        <p className="text-sm mt-2">Pratinjau gambar akan muncul di sini</p>
+                    </div>
+                )}
+                </div>
             </div>
              <p className="text-sm text-muted-foreground">
               Gambar ini akan menjadi gambar utama jika tidak ada foto yang ditandai sebagai 'slider'.
@@ -174,8 +151,8 @@ export default function AdminTampilanPage() {
         </CardContent>
       </Card>
 
-      <Button size="lg" type="submit" disabled={isLoading}>
-         {isLoading ? (
+      <Button size="lg" type="submit" disabled={isSaving}>
+         {isSaving ? (
             <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Menyimpan...

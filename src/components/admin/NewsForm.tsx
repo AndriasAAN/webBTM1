@@ -17,20 +17,19 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { useState } from 'react';
-import { Loader2, Upload } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Loader2, Image as ImageIcon } from 'lucide-react';
 import type { NewsArticle } from '@/lib/types';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useFirebase } from '@/firebase';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { addDoc, collection, doc, serverTimestamp, setDoc } from 'firebase/firestore';
 
 
 const formSchema = z.object({
   title: z.string().min(10, { message: 'Judul minimal 10 karakter.' }).max(100, { message: 'Judul maksimal 100 karakter.'}),
   content: z.string().min(50, { message: 'Isi berita minimal 50 karakter.' }),
-  thumbnailFile: z.instanceof(File).optional(),
+  thumbnailUrl: z.string().url({ message: 'URL gambar tidak valid.' }).optional().or(z.literal('')),
 });
 
 interface NewsFormProps {
@@ -40,32 +39,20 @@ interface NewsFormProps {
 export function NewsForm({ article }: NewsFormProps) {
   const { toast } = useToast();
   const router = useRouter();
-  const { firestore, firebaseApp } = useFirebase();
-  const storage = getStorage(firebaseApp);
+  const { firestore } = useFirebase();
   
   const [isLoading, setIsLoading] = useState(false);
-  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(article?.thumbnailUrl || null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: article?.title || '',
       content: article?.content || '',
-      thumbnailFile: undefined,
+      thumbnailUrl: article?.thumbnailUrl || '',
     },
   });
 
-  const handleThumbnailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setThumbnailPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-      form.setValue('thumbnailFile', file);
-    }
-  };
+  const thumbnailUrl = form.watch('thumbnailUrl');
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (!firestore) {
@@ -75,36 +62,25 @@ export function NewsForm({ article }: NewsFormProps) {
     setIsLoading(true);
 
     try {
-        let thumbnailUrl = article?.thumbnailUrl || '';
-
-        // 1. Upload thumbnail to Firebase Storage if a new one is selected
-        if (values.thumbnailFile) {
-            const file = values.thumbnailFile;
-            const storageRef = ref(storage, `news_thumbnails/${Date.now()}_${file.name}`);
-            const uploadResult = await uploadBytes(storageRef, file);
-            thumbnailUrl = await getDownloadURL(uploadResult.ref);
-        } else if (!thumbnailUrl) {
-            // Use a default placeholder if no image is provided for a new article
-            thumbnailUrl = 'https://images.unsplash.com/photo-1585241936939-be4099591252?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxuZXdzJTIwYXJ0aWNsZXxlbnwwfHx8fDE3NjUzMzM1MzN8MA&ixlib=rb-4.1.0&q=80&w=1080';
+        let finalThumbnailUrl = values.thumbnailUrl;
+        if (!finalThumbnailUrl) {
+            finalThumbnailUrl = 'https://images.unsplash.com/photo-1585241936939-be4099591252?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxuZXdzJTIwYXJ0aWNsZXxlbnwwfHx8fDE3NjUzMzM1MzN8MA&ixlib=rb-4.1.0&q=80&w=1080';
         }
 
         const articleData = {
             title: values.title,
             content: values.content,
-            thumbnailUrl: thumbnailUrl,
+            thumbnailUrl: finalThumbnailUrl,
             updatedAt: serverTimestamp(),
         };
 
-        // 2. Create or update the document in Firestore
         if (article) {
-            // Update existing article
             const docRef = doc(firestore, 'news_articles', article.id);
             await setDoc(docRef, {
                 ...articleData,
-                createdAt: article.createdAt // Preserve original creation date
+                createdAt: article.createdAt
             }, { merge: true });
         } else {
-            // Create new article
             const collectionRef = collection(firestore, 'news_articles');
             await addDoc(collectionRef, {
                 ...articleData,
@@ -118,7 +94,7 @@ export function NewsForm({ article }: NewsFormProps) {
         });
         
         router.push('/admin/berita');
-        router.refresh(); // Tell Next.js to re-fetch server components
+        router.refresh();
         
     } catch (error) {
         console.error("Error saving article: ", error);
@@ -182,32 +158,30 @@ export function NewsForm({ article }: NewsFormProps) {
                  <CardHeader>
                     <CardTitle>Thumbnail</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-4">
                      <FormField
                         control={form.control}
-                        name="thumbnailFile"
-                        render={() => (
+                        name="thumbnailUrl"
+                        render={({ field }) => (
                             <FormItem>
+                                <FormLabel>URL Gambar Thumbnail</FormLabel>
                                 <FormControl>
-                                    <div className="flex flex-col items-center justify-center w-full">
-                                        <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer bg-muted hover:bg-muted/80 relative">
-                                            {thumbnailPreview ? (
-                                                <Image src={thumbnailPreview} alt="Preview" fill className="object-contain rounded-lg p-2" />
-                                            ) : (
-                                                <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center">
-                                                    <Upload className="w-8 h-8 mb-4 text-muted-foreground" />
-                                                    <p className="mb-2 text-sm text-muted-foreground"><span className="font-semibold">Klik untuk upload</span></p>
-                                                    <p className="text-xs text-muted-foreground">PNG, JPG (MAX. 2MB)</p>
-                                                </div>
-                                            )}
-                                            <Input id="dropzone-file" type="file" className="hidden" accept="image/png, image/jpeg" onChange={handleThumbnailChange} />
-                                        </label>
-                                    </div> 
+                                    <Input placeholder="https://..." {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
                         )}
                         />
+                    <div className="aspect-video rounded-md border border-dashed bg-muted flex items-center justify-center overflow-hidden">
+                        {thumbnailUrl ? (
+                            <Image src={thumbnailUrl} alt="Preview Thumbnail" width={300} height={170} className="object-cover w-full h-full" />
+                        ): (
+                            <div className="text-center text-muted-foreground">
+                                <ImageIcon className="mx-auto h-8 w-8"/>
+                                <p className="text-sm mt-2">Pratinjau Gambar</p>
+                            </div>
+                        )}
+                    </div>
                 </CardContent>
             </Card>
             <Button type="submit" className="w-full" disabled={isLoading}>
