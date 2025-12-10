@@ -23,8 +23,12 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const handleLogout = async () => {
     if (auth) {
       await signOut(auth);
+      // Explicitly redirect to the homepage after sign-out is complete.
+      router.push('/');
+    } else {
+      // Fallback if auth is not available for some reason
+      router.push('/');
     }
-    router.push('/');
   };
 
   if (isUserLoading || !user) {
