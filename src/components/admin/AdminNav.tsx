@@ -10,6 +10,7 @@ import {
   Palette,
   LogOut,
   Flower2,
+  Phone,
 } from 'lucide-react';
 import { Button } from '../ui/button';
 
@@ -18,6 +19,7 @@ const navItems = [
   { href: '/admin/berita', label: 'Kelola Berita', icon: Newspaper },
   { href: '/admin/galeri', label: 'Kelola Galeri', icon: GalleryHorizontal },
   { href: '/admin/tampilan', label: 'Edit Tampilan', icon: Palette },
+  { href: '/admin/kontak', label: 'Pengaturan Kontak', icon: Phone },
 ];
 
 interface AdminNavProps {

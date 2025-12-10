@@ -22,4 +22,7 @@ export interface SiteSettings {
   headerImageUrl: string;
   tagline: string;
   themeColor: 'light-pink' | 'bright-pink' | 'rose-pink';
+  address?: string;
+  email?: string;
+  phone?: string;
 }
