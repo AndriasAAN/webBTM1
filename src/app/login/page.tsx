@@ -1,5 +1,8 @@
+'use client';
 import { LoginForm } from '@/components/auth/LoginForm';
-import { Flower2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, Flower2 } from 'lucide-react';
+import Link from 'next/link';
 
 export default function LoginPage() {
   return (
@@ -17,6 +20,14 @@ export default function LoginPage() {
           </p>
         </div>
         <LoginForm />
+        <div className="mt-6 text-center">
+          <Button variant="ghost" asChild>
+            <Link href="/">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Kembali ke Beranda
+            </Link>
+          </Button>
+        </div>
       </div>
     </div>
   );
