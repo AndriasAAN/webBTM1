@@ -11,9 +11,9 @@
  * Key Security Decisions:
  * - Admin Role Check: All write permissions for content collections depend on a single,
  *   performant check to the `/roles_admin` collection.
- * - Public Read, Admin Write: The `news_articles` and `gallery_photos` collections are
+ * - Public Read, Admin Write: The `news_articles`, `gallery_photos`, and `website_settings` collections are
  *   publicly readable by anyone but can only be modified by admins.
- * - Admin-Only Management: The `website_settings` and `roles_admin` collections are
+ * - Admin-Only Management: The `roles_admin` collections are
  *   fully locked down, allowing read and write access only to administrators. This
  *   prevents non-admins from viewing sensitive settings or discovering the identities
  *   of other admins.
@@ -86,15 +86,15 @@ service cloud.firestore {
     }
 
     /**
-     * @description Stores website settings like theme and header images. Both read and write
-     *              access are restricted to administrators.
+     * @description Stores website settings like theme and header images. Publicly readable,
+     *              but write access is restricted to administrators.
      * @path /website_settings/{websiteSettingId}
-     * @allow (update) An admin user updates the website's tagline.
-     * @deny (get) A regular signed-in user tries to read the settings document.
+     * @allow (get) An unauthenticated user reads the website's tagline.
+     * @deny (update) A regular signed-in user tries to update the settings document.
      * @principle Enforces strict admin-only access for sensitive configuration data.
      */
     match /website_settings/{websiteSettingId} {
-      allow get, list: if isAdmin();
+      allow get, list: if true;
       allow create: if isAdmin();
       allow update, delete: if isAdmin() && isExistingDoc();
     }
