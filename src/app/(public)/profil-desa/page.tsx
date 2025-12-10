@@ -87,8 +87,10 @@ export default function ProfilDesaPage() {
                 {officials.map((official) => (
                     <Card key={official.name} className="text-center hover:shadow-lg transition-shadow">
                         <CardContent className="p-6 flex flex-col items-center">
-                            <Avatar className="w-32 h-32 mb-4 border-4 border-primary/20">
-                                <AvatarImage src={PlaceHolderImages.find(p => p.id === official.imgId)?.imageUrl} alt={official.name} data-ai-hint={official.hint} />
+                            <Avatar className="w-32 h-32 mb-4 border-4 border-primary/20 relative">
+                                <AvatarImage src={PlaceHolderImages.find(p => p.id === official.imgId)?.imageUrl} alt={official.name} data-ai-hint={official.hint} asChild>
+                                  <Image src={PlaceHolderImages.find(p => p.id === official.imgId)?.imageUrl!} alt={official.name} fill className="object-cover" />
+                                </AvatarImage>
                                 <AvatarFallback>{official.name.substring(0,2)}</AvatarFallback>
                             </Avatar>
                             <h3 className="text-lg font-semibold">{official.name}</h3>
