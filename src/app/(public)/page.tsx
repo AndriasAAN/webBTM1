@@ -1,3 +1,4 @@
+'use client';
 import { HeroCarousel } from '@/components/home/HeroCarousel';
 import { LatestNews } from '@/components/home/LatestNews';
 import { Button } from '@/components/ui/button';
@@ -8,10 +9,11 @@ import { ArrowRight, Info, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Suspense } from 'react';
+import { useCollection, useDoc, useFirestore, useMemoFirebase } from '@/firebase';
+import { collection, doc, limit, orderBy, query } from 'firebase/firestore';
 
-// Mock data fetching functions. Replace with actual Firebase calls.
+
 async function getSiteSettings(): Promise<SiteSettings> {
-  // In a real app, this would fetch from Firestore.
   const defaultHeaderImage = PlaceHolderImages.find(p => p.id === 'default-header');
   return {
     tagline: 'Membangun Bersama, Sejahtera Bersama',
@@ -32,28 +34,16 @@ async function getSliderPhotos(): Promise<GalleryPhoto[]> {
   }));
 }
 
-async function getLatestNews(): Promise<NewsArticle[]> {
-  const newsPlaceholders = [
-    { id: "news-1", title: "Pembangunan Infrastruktur Desa", content: "Pemerintah desa memulai proyek perbaikan jalan utama untuk meningkatkan konektivitas.", hint: "village development" },
-    { id: "news-2", title: "Festival Budaya Tahunan Meriah", content: "Festival budaya tahunan kembali digelar dengan meriah, menampilkan berbagai kesenian lokal.", hint: "cultural festival" },
-    { id: "news-3", title: "Tim Sepak Bola Remaja Raih Juara", content: "Tim sepak bola remaja desa berhasil meraih juara pertama dalam turnamen antar kecamatan.", hint: "youth sports" },
-  ];
+function HomePageContent({ sliderPhotos, settings }: { sliderPhotos: GalleryPhoto[], settings: SiteSettings }) {
+  const firestore = useFirestore();
 
-  return newsPlaceholders.map(item => {
-    const placeholder = PlaceHolderImages.find(p => p.id === item.id);
-    return {
-      id: item.id,
-      title: item.title,
-      content: item.content,
-      thumbnailUrl: placeholder?.imageUrl || PlaceHolderImages.find(p => p.id === 'news-default')!.imageUrl,
-      createdAt: new Date(),
-    };
-  });
-}
-
-export default async function HomePage() {
-  const settings = await getSiteSettings();
-  const sliderPhotos = await getSliderPhotos();
+  const latestNewsQuery = useMemoFirebase(() => 
+    firestore 
+      ? query(collection(firestore, 'news_articles'), orderBy('createdAt', 'desc'), limit(3)) 
+      : null,
+    [firestore]
+  );
+  const { data: latestNews, isLoading: isNewsLoading } = useCollection<NewsArticle>(latestNewsQuery);
 
   return (
     <>
@@ -80,9 +70,22 @@ export default async function HomePage() {
               Ikuti perkembangan dan kegiatan terkini di Desa Batumarta 1.
             </p>
           </div>
-          <Suspense fallback={<LatestNews.Skeleton />}>
-             <LatestNews promise={getLatestNews()} />
-          </Suspense>
+          {isNewsLoading ? (
+            <LatestNews.Skeleton />
+          ) : latestNews && latestNews.length > 0 ? (
+             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {latestNews.map((article) => (
+                <NewsCard key={article.id} article={article} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-16 border rounded-lg bg-background">
+              <h2 className="text-2xl font-semibold">Belum Ada Berita</h2>
+              <p className="mt-2 text-muted-foreground">
+                Saat ini belum ada berita yang dipublikasikan.
+              </p>
+            </div>
+          )}
           <div className="text-center mt-12">
             <Button asChild size="lg">
               <Link href="/berita">
@@ -131,5 +134,26 @@ export default async function HomePage() {
          </div>
       </section>
     </>
+  )
+}
+
+
+export default function HomePage() {
+  // These are still using mock data as they are not the focus of the change.
+  // We can migrate them to Firebase in a separate step if needed.
+  const settingsPromise = getSiteSettings();
+  const sliderPhotosPromise = getSliderPhotos();
+
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PageContentLoader settingsPromise={settingsPromise} sliderPhotosPromise={sliderPhotosPromise} />
+    </Suspense>
   );
 }
+
+async function PageContentLoader({ settingsPromise, sliderPhotosPromise }: { settingsPromise: Promise<SiteSettings>, sliderPhotosPromise: Promise<GalleryPhoto[]> }) {
+  const settings = await settingsPromise;
+  const sliderPhotos = await sliderPhotosPromise;
+  return <HomePageContent settings={settings} sliderPhotos={sliderPhotos} />;
+}
+

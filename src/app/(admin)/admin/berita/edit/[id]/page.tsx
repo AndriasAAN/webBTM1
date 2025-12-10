@@ -1,38 +1,60 @@
+'use client';
+
 import { NewsForm } from '@/components/admin/NewsForm';
-import { notFound } from 'next/navigation';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { notFound, useRouter } from 'next/navigation';
 import type { NewsArticle } from '@/lib/types';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
+import { doc } from 'firebase/firestore';
+import { Skeleton } from '@/components/ui/skeleton';
 
-// Mock function. Replace with actual Firebase data fetching.
-async function getNewsArticle(id: string): Promise<NewsArticle | null> {
-    const item = { id: "news-1", title: "Pembangunan Infrastruktur Desa", content: "Pemerintah desa memulai proyek perbaikan jalan utama untuk meningkatkan konektivitas. Proyek ini diharapkan selesai dalam 3 bulan ke depan dan akan sangat membantu mobilitas warga sehari-hari.", hint: "village development" };
-    if (id !== 'news-1') return null;
-    
-    const placeholder = PlaceHolderImages.find(p => p.id === 'news-1');
-    return {
-      ...item,
-      thumbnailUrl: placeholder!.imageUrl,
-      createdAt: new Date(),
-    };
+function EditBeritaSkeleton() {
+    return (
+        <div className="space-y-8">
+            <div className="flex items-center gap-4">
+                <Skeleton className="h-7 w-7 rounded-md" />
+                <div>
+                    <Skeleton className="h-9 w-48 mb-2" />
+                    <Skeleton className="h-5 w-72" />
+                </div>
+            </div>
+            <div className="grid md:grid-cols-3 gap-8">
+                <div className="md:col-span-2 space-y-6">
+                    <Skeleton className="h-[450px] w-full" />
+                </div>
+                <div className="space-y-6">
+                    <Skeleton className="h-[200px] w-full" />
+                    <Skeleton className="h-11 w-full" />
+                </div>
+            </div>
+        </div>
+    )
 }
 
 
-export async function generateMetadata({ params }: { params: { id: string } }) {
-  const article = await getNewsArticle(params.id);
-  return {
-    title: `Edit: ${article?.title || 'Berita'} - Admin`,
-  };
-}
+export default function EditBeritaPage({ params }: { params: { id: string } }) {
+    const firestore = useFirestore();
+    const articleRef = useMemoFirebase(() => firestore ? doc(firestore, 'news_articles', params.id) : null, [firestore, params.id]);
+    const { data: article, isLoading, error } = useDoc<NewsArticle>(articleRef);
+    const router = useRouter();
 
-export default async function EditBeritaPage({ params }: { params: { id: string } }) {
-    const article = await getNewsArticle(params.id);
 
-    if (!article) {
+    if (isLoading) {
+        return <EditBeritaSkeleton />;
+    }
+
+    if (!article && !isLoading) {
         notFound();
     }
+    
+    if (error) {
+        console.error(error);
+        // Optionally show an error message to the user
+        return <div>Error loading article. Please try again later.</div>
+    }
+
 
     return (
         <div className="space-y-8">
@@ -46,11 +68,11 @@ export default async function EditBeritaPage({ params }: { params: { id: string 
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight">Edit Berita</h1>
                     <p className="text-muted-foreground max-w-xl truncate">
-                        Anda sedang mengedit: "{article.title}"
+                        Anda sedang mengedit: "{article?.title}"
                     </p>
                 </div>
             </div>
-            <NewsForm article={article} />
+            {article && <NewsForm article={article} />}
         </div>
     );
 }

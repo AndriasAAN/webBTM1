@@ -1,6 +1,8 @@
+'use client';
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { PlusCircle } from 'lucide-react';
+import { Loader2, MoreHorizontal, PlusCircle } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -17,8 +19,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import Image from 'next/image';
-import { Badge } from '@/components/ui/badge';
-import { MoreHorizontal } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,36 +28,75 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import type { NewsArticle } from '@/lib/types';
+import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { collection, deleteDoc, doc, orderBy, query } from 'firebase/firestore';
+import { useToast } from '@/hooks/use-toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { useState } from 'react';
+import { NewsCard } from '@/components/berita/NewsCard';
 
 
-// Mock function. Replace with actual Firebase data fetching.
-async function getNews(): Promise<NewsArticle[]> {
-  const newsPlaceholders = [
-    { id: "news-1", title: "Pembangunan Infrastruktur Desa", content: "Konten...", hint: "village development" },
-    { id: "news-2", title: "Festival Budaya Tahunan Meriah", content: "Konten...", hint: "cultural festival" },
-    { id: "news-3", title: "Tim Sepak Bola Remaja Raih Juara", content: "Konten...", hint: "youth sports" },
-  ];
-
-  return newsPlaceholders.map((item, index) => {
-    const placeholder = PlaceHolderImages.find(p => p.id === `news-${index + 1}`) || PlaceHolderImages.find(p => p.id === 'news-default');
-    return {
-      id: item.id,
-      title: item.title,
-      content: item.content,
-      thumbnailUrl: placeholder!.imageUrl,
-      createdAt: new Date(),
-    };
-  });
+function NewsRowSkeleton() {
+  return (
+    <TableRow>
+      <TableCell className="hidden sm:table-cell">
+        <div className="aspect-square rounded-md bg-muted animate-pulse w-16 h-16"></div>
+      </TableCell>
+      <TableCell className="font-medium">
+        <div className="h-5 w-48 bg-muted animate-pulse rounded"></div>
+      </TableCell>
+      <TableCell className="hidden md:table-cell">
+        <div className="h-5 w-24 bg-muted animate-pulse rounded"></div>
+      </TableCell>
+      <TableCell>
+        <div className="h-8 w-8 bg-muted animate-pulse rounded-full"></div>
+      </TableCell>
+    </TableRow>
+  )
 }
 
-export const metadata = {
-  title: 'Kelola Berita - Admin',
-};
+export default function AdminBeritaPage() {
+  const firestore = useFirestore();
+  const newsCollectionRef = useMemoFirebase(() => firestore ? query(collection(firestore, 'news_articles'), orderBy('createdAt', 'desc')) : null, [firestore]);
+  const { data: newsData, isLoading } = useCollection<NewsArticle>(newsCollectionRef);
 
-export default async function AdminBeritaPage() {
-  const newsData = await getNews();
+  const { toast } = useToast();
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [articleToDelete, setArticleToDelete] = useState<NewsArticle | null>(null);
+
+  const handleDelete = async () => {
+    if (!articleToDelete || !firestore) return;
+    setIsDeleting(true);
+    try {
+      const docRef = doc(firestore, 'news_articles', articleToDelete.id);
+      await deleteDoc(docRef);
+      toast({
+        title: 'Berhasil Dihapus',
+        description: `Artikel "${articleToDelete.title}" telah dihapus.`,
+      });
+    } catch (error) {
+      console.error("Error deleting document: ", error);
+      toast({
+        variant: 'destructive',
+        title: 'Gagal Menghapus',
+        description: 'Terjadi kesalahan saat menghapus artikel.',
+      });
+    } finally {
+      setIsDeleting(false);
+      setArticleToDelete(null);
+    }
+  };
+
 
   return (
     <div className="space-y-8">
@@ -79,7 +118,7 @@ export default async function AdminBeritaPage() {
         <CardHeader>
           <CardTitle>Daftar Berita</CardTitle>
           <CardDescription>
-            Total {newsData.length} artikel berita.
+            {isLoading ? 'Memuat berita...' : `Total ${newsData?.length || 0} artikel berita.`}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -90,14 +129,17 @@ export default async function AdminBeritaPage() {
                   <span className="sr-only">Gambar</span>
                 </TableHead>
                 <TableHead>Judul</TableHead>
-                <TableHead className="hidden md:table-cell">Tanggal</TableHead>
+                <TableHead className="hidden md:table-cell">Tanggal Dibuat</TableHead>
                 <TableHead>
                   <span className="sr-only">Aksi</span>
                 </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {newsData.map((article) => (
+              {isLoading ? (
+                Array.from({ length: 3 }).map((_, i) => <NewsRowSkeleton key={i} />)
+              ) : newsData && newsData.length > 0 ? (
+                newsData.map((article) => (
                 <TableRow key={article.id}>
                   <TableCell className="hidden sm:table-cell">
                     <Image
@@ -110,7 +152,7 @@ export default async function AdminBeritaPage() {
                   </TableCell>
                   <TableCell className="font-medium">{article.title}</TableCell>
                   <TableCell className="hidden md:table-cell">
-                    {format(article.createdAt as Date, 'dd MMMM yyyy', { locale: id })}
+                     {article.createdAt ? format((article.createdAt as any).toDate(), 'dd MMMM yyyy', { locale: id }) : 'N/A'}
                   </TableCell>
                   <TableCell>
                     <DropdownMenu>
@@ -127,16 +169,42 @@ export default async function AdminBeritaPage() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Aksi</DropdownMenuLabel>
                         <DropdownMenuItem asChild><Link href={`/admin/berita/edit/${article.id}`}>Edit</Link></DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive">Hapus</DropdownMenuItem>
+                        <DropdownMenuItem className="text-destructive" onClick={() => setArticleToDelete(article)}>Hapus</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
                 </TableRow>
-              ))}
+              ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={4} className="h-24 text-center">
+                    Belum ada berita.
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
+      
+      <AlertDialog open={!!articleToDelete} onOpenChange={(open) => !open && setArticleToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Anda yakin ingin menghapus?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tindakan ini tidak dapat dibatalkan. Ini akan menghapus artikel <span className="font-semibold">"{articleToDelete?.title}"</span> secara permanen.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Batal</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} disabled={isDeleting} className="bg-destructive hover:bg-destructive/90">
+              {isDeleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              Hapus
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
     </div>
   );
 }
