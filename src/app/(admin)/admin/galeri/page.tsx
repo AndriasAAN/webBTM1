@@ -36,6 +36,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useRouter } from 'next/navigation';
 
 function AddPhotoDialog() {
     const { firestore } = useFirebase();
@@ -130,6 +131,7 @@ function AddPhotoDialog() {
 export default function AdminGaleriPage() {
   const { firestore } = useFirebase();
   const { toast } = useToast();
+  const router = useRouter();
 
   const photosCollectionRef = useMemoFirebase(() => firestore ? query(collection(firestore, 'gallery_photos'), orderBy('createdAt', 'desc')) : null, [firestore]);
   const { data: photos, isLoading } = useCollection<GalleryPhoto>(photosCollectionRef);
@@ -175,6 +177,7 @@ export default function AdminGaleriPage() {
     } finally {
         setIsDeleting(false);
         setPhotoToDelete(null);
+        router.refresh();
     }
   }
 
