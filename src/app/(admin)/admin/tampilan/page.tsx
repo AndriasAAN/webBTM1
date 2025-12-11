@@ -22,7 +22,7 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import type { SiteSettings } from '@/lib/types';
+import type { SiteSettings, ThemeColor } from '@/lib/types';
 import { useFirebase, useDoc, useMemoFirebase } from '@/firebase';
 import { doc, setDoc } from 'firebase/firestore';
 
@@ -36,7 +36,7 @@ export default function AdminTampilanPage() {
 
   const [isSaving, setIsSaving] = useState(false);
   const [tagline, setTagline] = useState('');
-  const [themeColor, setThemeColor] = useState<SiteSettings['themeColor']>('light-pink');
+  const [themeColor, setThemeColor] = useState<ThemeColor>('light-pink');
   const [headerImageUrl, setHeaderImageUrl] = useState('');
 
 
@@ -45,8 +45,19 @@ export default function AdminTampilanPage() {
       setTagline(currentSettings.tagline);
       setThemeColor(currentSettings.themeColor);
       setHeaderImageUrl(currentSettings.headerImageUrl);
+      // Apply the theme from DB on initial load
+      document.body.className = `theme-${currentSettings.themeColor}`;
+    } else {
+      // Apply default theme if no settings found
+      document.body.className = 'theme-light-pink';
     }
   }, [currentSettings]);
+  
+  const handleThemeChange = (value: ThemeColor) => {
+    setThemeColor(value);
+    // Apply theme preview
+    document.body.className = `theme-${value}`;
+  }
 
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -58,7 +69,7 @@ export default function AdminTampilanPage() {
     setIsSaving(true);
 
     try {
-      const settingsData: SiteSettings = {
+      const settingsData: Partial<SiteSettings> = {
         tagline,
         themeColor,
         headerImageUrl,
@@ -70,7 +81,7 @@ export default function AdminTampilanPage() {
         title: 'Berhasil Disimpan',
         description: 'Perubahan tampilan telah disimpan.',
       });
-      router.refresh();
+      // No need for router.refresh() as the live theme manager will handle it
     } catch (error) {
        console.error("Error saving settings: ", error);
         toast({
@@ -134,7 +145,7 @@ export default function AdminTampilanPage() {
           
           <div className="space-y-2">
             <Label htmlFor="theme-color">Warna Tema</Label>
-            <Select value={themeColor} onValueChange={(value: SiteSettings['themeColor']) => setThemeColor(value)}>
+            <Select value={themeColor} onValueChange={handleThemeChange}>
               <SelectTrigger id="theme-color">
                 <SelectValue placeholder="Pilih warna tema" />
               </SelectTrigger>
@@ -142,6 +153,10 @@ export default function AdminTampilanPage() {
                 <SelectItem value="light-pink">Pink Muda</SelectItem>
                 <SelectItem value="bright-pink">Pink Cerah</SelectItem>
                 <SelectItem value="rose-pink">Rose Pink</SelectItem>
+                <SelectItem value="sky-blue">Biru Langit</SelectItem>
+                <SelectItem value="calm-green">Hijau Teduh</SelectItem>
+                <SelectItem value="sunset-orange">Oranye Senja</SelectItem>
+                <SelectItem value="elegant-purple">Ungu Elegan</SelectItem>
               </SelectContent>
             </Select>
             <p className="text-sm text-muted-foreground">

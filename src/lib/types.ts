@@ -17,11 +17,20 @@ export interface GalleryPhoto {
   createdAt?: Timestamp | Date;
 }
 
+export type ThemeColor = 
+  | 'light-pink' 
+  | 'bright-pink' 
+  | 'rose-pink'
+  | 'sky-blue'
+  | 'calm-green'
+  | 'sunset-orange'
+  | 'elegant-purple';
+
 export interface SiteSettings {
   id?: string;
   headerImageUrl: string;
   tagline: string;
-  themeColor: 'light-pink' | 'bright-pink' | 'rose-pink';
+  themeColor: ThemeColor;
   address?: string;
   email?: string;
   phone?: string;
@@ -41,5 +50,3 @@ export interface ProfileSettings {
     mission: string;
     officials: Official[];
 }
-
-    
