@@ -15,7 +15,6 @@ export default function GaleriPage() {
   );
   const { data: photos, isLoading } = useCollection<GalleryPhoto>(photosQuery);
 
-  // loading.tsx handles the loading state
   if (isLoading) {
     return null;
   }
@@ -30,12 +29,12 @@ export default function GaleriPage() {
           </p>
         </div>
       </header>
-      <main className="py-16">
+      <main className="py-16 bg-blue-50">
         <div className="container">
           {photos && photos.length > 0 ? (
             <PhotoGrid photos={photos} />
           ) : (
-             <div className="text-center py-16 border rounded-lg">
+             <div className="text-center py-16 border rounded-lg bg-background">
               <h2 className="text-2xl font-semibold uppercase text-destructive">
                 BELUM ADA FOTO PADA HALAMAN INI
               </h2>

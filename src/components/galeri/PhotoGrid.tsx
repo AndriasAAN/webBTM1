@@ -23,7 +23,7 @@ export function PhotoGrid({ photos }: PhotoGridProps) {
         {photos.map((photo) => (
           <Card
             key={photo.id}
-            className="overflow-hidden cursor-pointer group relative"
+            className="overflow-hidden cursor-pointer group relative bg-blue-100"
             onClick={() => setSelectedImage(photo)}
           >
             <CardContent className="p-0 aspect-w-1 aspect-h-1">
@@ -65,5 +65,3 @@ export function PhotoGrid({ photos }: PhotoGridProps) {
     </>
   );
 }
-
-    
