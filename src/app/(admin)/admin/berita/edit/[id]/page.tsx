@@ -1,70 +1,62 @@
 'use client';
 
 import { NewsForm } from '@/components/admin/NewsForm';
-import { notFound, useRouter } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import type { NewsArticle } from '@/lib/types';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { useDoc, useFirestore } from '@/firebase';
-import { doc } from 'firebase/firestore';
+import { useFirestore } from '@/firebase';
+import { doc, getDoc } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 
-export default function EditBeritaPage({ params }: { params: { id: string } }) {
-    const { id } = params;
+export default function EditBeritaPage({ params }: { params: Promise<{ id: string }> }) {
+    // Menggunakan React.use() untuk mengekstrak nilai dari Promise params
+    const { id } = React.use(params);
     const firestore = useFirestore();
     const [article, setArticle] = useState<NewsArticle | null>(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<Error | null>(null);
     
     useEffect(() => {
-        if (!firestore || !id) {
-            setIsLoading(false);
+        if (!firestore) {
             return;
+        }
+
+        const fetchArticle = async () => {
+            setIsLoading(true);
+            try {
+                const docRef = doc(firestore, 'news_articles', id);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    setArticle({ id: docSnap.id, ...docSnap.data() } as NewsArticle);
+                } else {
+                    notFound();
+                }
+            } catch (error) {
+                console.error("Error fetching article:", error);
+                // Handle error state if necessary, e.g., show an error message
+            } finally {
+                setIsLoading(false);
+            }
         };
 
-        const articleRef = doc(firestore, 'news_articles', id);
-        const { data, isLoading: docIsLoading, error: docError } = useDoc<NewsArticle>(articleRef);
-        
-        // This is a workaround to sync useDoc with local state.
-        // A better approach might be to directly use useDoc's return values, but this is safer for now.
-        if (!docIsLoading) {
-            if (docError) {
-                setError(docError);
-            } else if (data) {
-                setArticle(data);
-            }
-            setIsLoading(false);
-        }
+        fetchArticle();
+    }, [firestore, id]);
 
-    }, [firestore, id, useDoc]);
-
-    useEffect(() => {
-        if (!isLoading && !article) {
-           // To ensure `useDoc` has had a chance to fetch, we check after loading.
-           const docRef = firestore ? doc(firestore, 'news_articles', id) : null;
-           const { data: currentData } = useDoc<NewsArticle>(docRef);
-           if (!currentData) {
-               notFound();
-           } else {
-               setArticle(currentData);
-           }
-        }
-    }, [isLoading, article, firestore, id]);
-
-
-    if (error) {
-        console.error(error);
-        return <div>Error loading article. Please try again later.</div>
-    }
-
-    if (isLoading || !article) {
-        // You can use the loading.tsx file for a better loading UI
+    if (isLoading) {
         return (
-            <div className="flex h-screen w-full items-center justify-center">
+             <div className="flex h-screen w-full items-center justify-center">
                 <p>Memuat editor...</p>
             </div>
         );
+    }
+    
+    if (!article) {
+        // This case will be handled by notFound() inside useEffect, 
+        // but as a fallback, we can show a message or redirect.
+        // It's better to let notFound() handle it for consistency.
+        return null;
     }
     
     return (
