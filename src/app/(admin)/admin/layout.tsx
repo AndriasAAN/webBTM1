@@ -1,12 +1,38 @@
 'use client';
 
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth, useUser } from '@/firebase';
+import { useAuth, useDoc, useFirestore, useMemoFirebase, useUser } from '@/firebase';
 import { AdminNav } from '@/components/admin/AdminNav';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { signOut } from 'firebase/auth';
+import { SiteSettings } from '@/lib/types';
+import { doc } from 'firebase/firestore';
+
+function AdminThemeManager() {
+  const firestore = useFirestore();
+  const settingsRef = useMemoFirebase(() => 
+    firestore 
+      ? doc(firestore, 'website_settings', 'default') 
+      : null,
+    [firestore]
+  );
+  const { data: settings } = useDoc<SiteSettings>(settingsRef);
+
+  useEffect(() => {
+    const defaultTheme = 'theme-light-pink';
+    if (typeof window === 'undefined') return;
+
+    if (settings?.themeColor) {
+      document.body.className = `theme-${settings.themeColor}`;
+    } else {
+      document.body.className = defaultTheme;
+    }
+  }, [settings]);
+
+  return null;
+}
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const { user, isUserLoading, userError } = useUser();
@@ -14,7 +40,6 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    // If auth state is determined and there's no user, or user is not the admin, redirect.
     if (!isUserLoading && (user?.email !== 'asse181086@gmail.com')) {
       router.replace('/login');
     }
@@ -23,10 +48,8 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const handleLogout = async () => {
     if (auth) {
       await signOut(auth);
-      // Explicitly redirect to the homepage after sign-out is complete.
       router.push('/');
     } else {
-      // Fallback if auth is not available for some reason
       router.push('/');
     }
   };
@@ -44,21 +67,23 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       return null;
   }
 
-
   return (
-    <div className="flex min-h-screen bg-muted/40">
-      <AdminNav onLogout={handleLogout} />
-      <main className="flex-1 flex flex-col">
-         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6 py-4">
-            <h1 className="text-xl font-semibold">Admin Panel</h1>
-             <div className="ml-auto">
-               <Button variant="outline" onClick={handleLogout}>Logout</Button>
-            </div>
-         </header>
-         <div className="p-4 sm:px-6 sm:py-0 flex-1 overflow-auto">
-            {children}
-         </div>
-      </main>
-    </div>
+    <>
+      <AdminThemeManager />
+      <div className="flex min-h-screen bg-muted/40">
+        <AdminNav onLogout={handleLogout} />
+        <main className="flex-1 flex flex-col">
+           <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6 py-4">
+              <h1 className="text-xl font-semibold">Admin Panel</h1>
+               <div className="ml-auto">
+                 <Button variant="outline" onClick={handleLogout}>Logout</Button>
+              </div>
+           </header>
+           <div className="p-4 sm:px-6 sm:py-0 flex-1 overflow-auto">
+              {children}
+           </div>
+        </main>
+      </div>
+    </>
   );
 }

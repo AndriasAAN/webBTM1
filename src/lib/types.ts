@@ -24,7 +24,9 @@ export type ThemeColor =
   | 'sky-blue'
   | 'calm-green'
   | 'sunset-orange'
-  | 'elegant-purple';
+  | 'elegant-purple'
+  | 'forest-green'
+  | 'deep-purple';
 
 export interface SiteSettings {
   id?: string;

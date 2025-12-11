@@ -47,18 +47,15 @@ export default function AdminTampilanPage() {
       setThemeColor(currentSettings.themeColor);
       setHeaderImageUrl(currentSettings.headerImageUrl);
       setTaglineColor(currentSettings.taglineColor || 'white');
-      // Apply the theme from DB on initial load
-      document.body.className = `theme-${currentSettings.themeColor}`;
-    } else {
-      // Apply default theme if no settings found
-      document.body.className = 'theme-light-pink';
     }
   }, [currentSettings]);
   
   const handleThemeChange = (value: ThemeColor) => {
     setThemeColor(value);
     // Apply theme preview
-    document.body.className = `theme-${value}`;
+    if (typeof window !== 'undefined') {
+        document.body.className = `theme-${value}`;
+    }
   }
 
 
@@ -180,6 +177,8 @@ export default function AdminTampilanPage() {
                 <SelectItem value="calm-green">Hijau Teduh</SelectItem>
                 <SelectItem value="sunset-orange">Oranye Senja</SelectItem>
                 <SelectItem value="elegant-purple">Ungu Elegan</SelectItem>
+                <SelectItem value="forest-green">Hijau Hutan</SelectItem>
+                <SelectItem value="deep-purple">Ungu Pekat</SelectItem>
               </SelectContent>
             </Select>
             <p className="text-sm text-muted-foreground">
