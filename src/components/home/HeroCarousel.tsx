@@ -28,8 +28,8 @@ export function HeroCarousel({ photos, tagline, taglineColor = 'white' }: HeroCa
         opts={{ loop: true }}
       >
         <CarouselContent className="h-full">
-          {photos.map((photo) => (
-            <CarouselItem key={photo.id} className="h-full">
+          {photos.map((photo, index) => (
+            <CarouselItem key={photo.id || index} className="h-full">
               <Card className="h-full w-full border-none rounded-none">
                 <CardContent className="relative flex h-full w-full items-center justify-center p-0">
                   <Image
@@ -37,7 +37,7 @@ export function HeroCarousel({ photos, tagline, taglineColor = 'white' }: HeroCa
                     alt={photo.name || 'Village photo'}
                     fill
                     className="object-cover"
-                    priority={photos.indexOf(photo) === 0}
+                    priority={index === 0}
                     sizes="100vw"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
