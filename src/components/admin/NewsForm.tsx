@@ -80,23 +80,26 @@ export function NewsForm({ article }: NewsFormProps) {
     try {
         const finalThumbnailUrl = values.thumbnailUrl || 'https://picsum.photos/seed/news-default/1080/720';
 
-        const articleData = {
-            title: values.title,
-            content: values.content,
-            thumbnailUrl: finalThumbnailUrl,
-            updatedAt: serverTimestamp(),
-            createdAt: values.createdAt,
-        };
-
         if (article) {
             // Update existing document
+            const articleData = {
+                title: values.title,
+                content: values.content,
+                thumbnailUrl: finalThumbnailUrl,
+                createdAt: values.createdAt,
+                updatedAt: serverTimestamp(),
+            };
             const docRef = doc(firestore, 'news_articles', article.id);
-            await setDoc(docRef, {
-                ...articleData,
-                createdAt: article.createdAt // Preserve original creation date on update
-            }, { merge: true });
+            await setDoc(docRef, articleData, { merge: true });
         } else {
             // Create new document
+            const articleData = {
+                title: values.title,
+                content: values.content,
+                thumbnailUrl: finalThumbnailUrl,
+                createdAt: values.createdAt,
+                updatedAt: serverTimestamp(),
+            };
             const collectionRef = collection(firestore, 'news_articles');
             await addDoc(collectionRef, articleData);
         }
