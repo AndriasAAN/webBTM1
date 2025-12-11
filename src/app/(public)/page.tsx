@@ -71,9 +71,9 @@ export default function HomePage() {
       </section>
       
       {finalSettings.headerImageUrl && (
-        <section className="py-8 bg-muted">
+        <section className="py-4">
           <div className="container">
-            <div className="relative aspect-video md:aspect-[16/6] rounded-xl overflow-hidden shadow-lg">
+            <div className="relative aspect-video md:aspect-[16/7] rounded-xl overflow-hidden shadow-lg">
                <Image
                 src={finalSettings.headerImageUrl}
                 alt="Gambar Header Desa Batumarta 1"
