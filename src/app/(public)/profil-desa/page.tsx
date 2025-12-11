@@ -1,21 +1,81 @@
+'use client';
+
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { BookOpen, Flag, Target } from 'lucide-react';
+import { BookOpen, Flag, Target, Loader2 } from 'lucide-react';
 import Image from 'next/image';
+import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
+import { doc } from 'firebase/firestore';
+import type { ProfileSettings } from '@/lib/types';
+import { Skeleton } from '@/components/ui/skeleton';
 
-export const metadata = {
-  title: 'Profil Desa - Desa Batumarta 1',
-  description: 'Sejarah, visi, misi, dan struktur pemerintahan Desa Batumarta 1.',
-};
 
-const officials = [
-  { name: 'Bapak Kepala Desa', role: 'Kepala Desa', imgId: 'profile-head', hint: 'person portrait' },
-  { name: 'Ibu Sekretaris', role: 'Sekretaris Desa', imgId: 'profile-secretary', hint: 'person portrait' },
-  { name: 'Bapak Bendahara', role: 'Bendahara Desa', imgId: 'profile-treasurer', hint: 'person portrait' },
-];
+function ProfilePageSkeleton() {
+  return (
+    <div className="container max-w-5xl mx-auto space-y-16 py-16">
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-8 w-48" />
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Skeleton className="h-5 w-full" />
+          <Skeleton className="h-5 w-full" />
+          <Skeleton className="h-5 w-4/5" />
+        </CardContent>
+      </Card>
+      <div className="grid md:grid-cols-2 gap-8">
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-8 w-24" />
+          </CardHeader>
+          <CardContent>
+            <Skeleton className="h-5 w-full" />
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-8 w-24" />
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <Skeleton className="h-5 w-full" />
+            <Skeleton className="h-5 w-4/5" />
+            <Skeleton className="h-5 w-full" />
+          </CardContent>
+        </Card>
+      </div>
+      <div className="text-center">
+        <Skeleton className="h-9 w-64 mx-auto mb-10" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Card key={i}>
+              <CardContent className="p-6 flex flex-col items-center">
+                <Skeleton className="w-32 h-32 rounded-full mb-4" />
+                <Skeleton className="h-6 w-3/4 mb-2" />
+                <Skeleton className="h-5 w-1/2" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default function ProfilDesaPage() {
+
+  const firestore = useFirestore();
+  const profileRef = useMemoFirebase(() => firestore ? doc(firestore, 'website_settings', 'profile') : null, [firestore]);
+  const { data: settings, isLoading } = useDoc<ProfileSettings>(profileRef);
+
+  const history = settings?.history || "Desa Batumarta 1 merupakan salah satu desa yang berada di Kecamatan Lubuk Raja, Kabupaten Ogan Komering Ulu. Desa ini didirikan pada tahun XXXX melalui program transmigrasi. Nama \"Batumarta\" memiliki makna filosofis yang mendalam bagi para pendirinya, melambangkan harapan akan kehidupan yang kokoh dan sejahtera.\n\nSejak awal berdirinya, masyarakat Desa Batumarta 1 dikenal dengan semangat gotong royong dan kerja kerasnya. Berbagai pembangunan, baik fisik maupun non-fisik, telah berhasil diwujudkan berkat kerjasama antara pemerintah desa dan seluruh lapisan masyarakat. Kini, Desa Batumarta 1 terus berkembang menjadi desa yang dinamis dengan tetap menjaga kearifan lokal.";
+  const vision = settings?.vision || '"Terwujudnya Desa Batumarta 1 yang Maju, Mandiri, Sejahtera, dan Berbudaya Berlandaskan Iman dan Taqwa."';
+  const mission = settings?.mission || 'Meningkatkan kualitas sumber daya manusia.\nMengoptimalkan potensi ekonomi desa.\nMeningkatkan kualitas infrastruktur desa.\nMewujudkan tata kelola pemerintahan yang baik.\nMelestarikan nilai-nilai budaya dan kearifan lokal.';
+  const officials = settings?.officials || [
+    { name: 'Bapak Kepala Desa', role: 'Kepala Desa', imageUrl: 'https://picsum.photos/seed/profile-head/400/400', hint: 'person portrait' },
+    { name: 'Ibu Sekretaris', role: 'Sekretaris Desa', imageUrl: 'https://picsum.photos/seed/profile-secretary/400/400', hint: 'person portrait' },
+    { name: 'Bapak Bendahara', role: 'Bendahara Desa', imageUrl: 'https://picsum.photos/seed/profile-treasurer/400/400', hint: 'person portrait' },
+  ];
+
   return (
     <>
       <header className="bg-muted py-12">
@@ -27,82 +87,81 @@ export default function ProfilDesaPage() {
         </div>
       </header>
       <main className="py-16">
-        <div className="container max-w-5xl mx-auto space-y-16">
-          
-          <section id="sejarah">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-3 text-2xl">
-                  <BookOpen className="w-7 h-7 text-primary"/>
-                  Sejarah Singkat Desa
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 text-muted-foreground leading-relaxed">
-                <p>
-                  Desa Batumarta 1 merupakan salah satu desa yang berada di Kecamatan Lubuk Raja, Kabupaten Ogan Komering Ulu. Desa ini didirikan pada tahun XXXX melalui program transmigrasi. Nama "Batumarta" memiliki makna filosofis yang mendalam bagi para pendirinya, melambangkan harapan akan kehidupan yang kokoh dan sejahtera.
-                </p>
-                <p>
-                  Sejak awal berdirinya, masyarakat Desa Batumarta 1 dikenal dengan semangat gotong royong dan kerja kerasnya. Berbagai pembangunan, baik fisik maupun non-fisik, telah berhasil diwujudkan berkat kerjasama antara pemerintah desa dan seluruh lapisan masyarakat. Kini, Desa Batumarta 1 terus berkembang menjadi desa yang dinamis dengan tetap menjaga kearifan lokal.
-                </p>
-              </CardContent>
-            </Card>
-          </section>
+        {isLoading ? <ProfilePageSkeleton /> : (
+            <div className="container max-w-5xl mx-auto space-y-16">
+            
+            <section id="sejarah">
+                <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-3 text-2xl">
+                    <BookOpen className="w-7 h-7 text-primary"/>
+                    Sejarah Singkat Desa
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4 text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                    <p>{history}</p>
+                </CardContent>
+                </Card>
+            </section>
 
-          <section id="visi-misi" className="grid md:grid-cols-2 gap-8">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-3 text-2xl">
-                  <Flag className="w-7 h-7 text-primary"/>
-                  Visi
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground leading-relaxed">
-                  "Terwujudnya Desa Batumarta 1 yang Maju, Mandiri, Sejahtera, dan Berbudaya Berlandaskan Iman dan Taqwa."
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-3 text-2xl">
-                  <Target className="w-7 h-7 text-primary"/>
-                  Misi
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-muted-foreground list-disc list-inside">
-                  <li>Meningkatkan kualitas sumber daya manusia.</li>
-                  <li>Mengoptimalkan potensi ekonomi desa.</li>
-                  <li>Meningkatkan kualitas infrastruktur desa.</li>
-                  <li>Mewujudkan tata kelola pemerintahan yang baik.</li>
-                  <li>Melestarikan nilai-nilai budaya dan kearifan lokal.</li>
-                </ul>
-              </CardContent>
-            </Card>
-          </section>
+            <section id="visi-misi" className="grid md:grid-cols-2 gap-8">
+                <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-3 text-2xl">
+                    <Flag className="w-7 h-7 text-primary"/>
+                    Visi
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-muted-foreground leading-relaxed">
+                    {vision}
+                    </p>
+                </CardContent>
+                </Card>
+                <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-3 text-2xl">
+                    <Target className="w-7 h-7 text-primary"/>
+                    Misi
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <ul className="space-y-2 text-muted-foreground list-disc list-inside">
+                        {mission.split('\n').map((item, index) => (
+                            <li key={index}>{item}</li>
+                        ))}
+                    </ul>
+                </CardContent>
+                </Card>
+            </section>
 
-          <section id="perangkat-desa">
-             <h2 className="text-3xl font-bold text-center mb-10">Perangkat Desa</h2>
-             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-                {officials.map((official) => (
-                    <Card key={official.name} className="text-center hover:shadow-lg transition-shadow">
-                        <CardContent className="p-6 flex flex-col items-center">
-                            <Avatar className="w-32 h-32 mb-4 border-4 border-primary/20 relative">
-                                <AvatarImage src={PlaceHolderImages.find(p => p.id === official.imgId)?.imageUrl} alt={official.name} data-ai-hint={official.hint} asChild>
-                                  <Image src={PlaceHolderImages.find(p => p.id === official.imgId)?.imageUrl!} alt={official.name} fill className="object-cover" />
-                                </AvatarImage>
-                                <AvatarFallback>{official.name.substring(0,2)}</AvatarFallback>
-                            </Avatar>
-                            <h3 className="text-lg font-semibold">{official.name}</h3>
-                            <p className="text-primary font-medium">{official.role}</p>
-                        </CardContent>
-                    </Card>
-                ))}
-             </div>
-          </section>
+            <section id="perangkat-desa">
+                <h2 className="text-3xl font-bold text-center mb-10">Perangkat Desa</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+                    {officials.map((official) => (
+                        <Card key={official.name} className="text-center hover:shadow-lg transition-shadow">
+                            <CardContent className="p-6 flex flex-col items-center">
+                                <div className="w-32 h-32 mb-4 relative">
+                                    <Avatar className="w-32 h-32 border-4 border-primary/20">
+                                        <AvatarImage src={official.imageUrl} alt={official.name} asChild>
+                                          <Image src={official.imageUrl} alt={official.name} fill className="object-cover" data-ai-hint={official.hint} />
+                                        </AvatarImage>
+                                        <AvatarFallback>{official.name.substring(0,2)}</AvatarFallback>
+                                    </Avatar>
+                                </div>
+                                <h3 className="text-lg font-semibold">{official.name}</h3>
+                                <p className="text-primary font-medium">{official.role}</p>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+            </section>
 
-        </div>
+            </div>
+        )}
       </main>
     </>
   );
 }
+
+    

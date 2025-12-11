@@ -26,3 +26,20 @@ export interface SiteSettings {
   email?: string;
   phone?: string;
 }
+
+export interface Official {
+    name: string;
+    role: string;
+    imageUrl: string;
+    hint: string;
+}
+
+export interface ProfileSettings {
+    id?: string;
+    history: string;
+    vision: string;
+    mission: string;
+    officials: Official[];
+}
+
+    

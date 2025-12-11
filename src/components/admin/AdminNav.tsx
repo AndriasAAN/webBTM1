@@ -10,6 +10,7 @@ import {
   Palette,
   LogOut,
   Phone,
+  FileText,
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import Image from 'next/image';
@@ -19,6 +20,7 @@ const navItems = [
   { href: '/admin/berita', label: 'Kelola Berita', icon: Newspaper },
   { href: '/admin/galeri', label: 'Kelola Galeri', icon: GalleryHorizontal },
   { href: '/admin/tampilan', label: 'Edit Tampilan', icon: Palette },
+  { href: '/admin/profil', label: 'Edit Profil Desa', icon: FileText },
   { href: '/admin/kontak', label: 'Pengaturan Kontak', icon: Phone },
 ];
 
@@ -68,3 +70,5 @@ export function AdminNav({ onLogout }: AdminNavProps) {
     </aside>
   );
 }
+
+    
