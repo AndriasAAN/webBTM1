@@ -26,14 +26,16 @@ export function PhotoGrid({ photos }: PhotoGridProps) {
             className="overflow-hidden cursor-pointer group relative bg-blue-100"
             onClick={() => setSelectedImage(photo)}
           >
-            <CardContent className="p-0 aspect-w-1 aspect-h-1">
-              <Image
-                src={photo.url}
-                alt={photo.name || 'Gallery photo'}
-                fill
-                className="object-cover transform transition-transform duration-300 group-hover:scale-110"
-                sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-              />
+            <CardContent className="p-0">
+              <div className="aspect-[4/3] w-full relative">
+                <Image
+                  src={photo.url}
+                  alt={photo.name || 'Gallery photo'}
+                  fill
+                  className="object-cover transform transition-transform duration-300 group-hover:scale-110"
+                  sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                />
+              </div>
               <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                   <Maximize className="w-8 h-8 text-white" />
               </div>
