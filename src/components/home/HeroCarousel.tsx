@@ -21,7 +21,7 @@ interface HeroCarouselProps {
 
 export function HeroCarousel({ photos, tagline, taglineColor = 'white' }: HeroCarouselProps) {
   return (
-    <section className="relative w-full h-[50vh] md:h-[calc(100vh-4rem)] overflow-hidden">
+    <section className="relative w-full h-[50vh] md:h-[70vh] overflow-hidden">
       <Carousel
         className="w-full h-full"
         plugins={[Autoplay({ delay: 5000, stopOnInteraction: true })]}

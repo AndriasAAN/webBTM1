@@ -48,20 +48,14 @@ export default function HomePage() {
   const carouselPhotos = sliderPhotos && sliderPhotos.length > 0
     ? sliderPhotos
     : [{
-        id: 'default-header-image',
-        name: finalSettings.tagline,
-        url: finalSettings.headerImageUrl,
+        id: 'default-carousel-placeholder',
+        name: 'Selamat Datang',
+        url: 'https://picsum.photos/seed/carousel-default/1600/900',
         isSlider: true,
       }];
 
   return (
     <>
-      <HeroCarousel 
-        photos={carouselPhotos} 
-        tagline={finalSettings.tagline} 
-        taglineColor={finalSettings.taglineColor} 
-      />
-
       <section className="py-16 lg:py-24">
         <div className="container">
           <div className="text-center max-w-3xl mx-auto">
@@ -75,6 +69,28 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      
+      {finalSettings.headerImageUrl && (
+        <section className="py-8 bg-muted">
+          <div className="container">
+            <div className="relative aspect-video md:aspect-[16/6] rounded-xl overflow-hidden shadow-lg">
+               <Image
+                src={finalSettings.headerImageUrl}
+                alt="Gambar Header Desa Batumarta 1"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 1200px"
+              />
+            </div>
+          </div>
+        </section>
+      )}
+
+      <HeroCarousel 
+        photos={carouselPhotos} 
+        tagline={finalSettings.tagline} 
+        taglineColor={finalSettings.taglineColor} 
+      />
 
       <section className="bg-muted py-16 lg:py-24">
         <div className="container">
