@@ -2,12 +2,13 @@
 import { NewsCard } from '@/components/berita/NewsCard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import type { NewsArticle, SiteSettings } from '@/lib/types';
+import type { NewsArticle, SiteSettings, GalleryPhoto } from '@/lib/types';
 import { ArrowRight, Info, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCollection, useDoc, useFirestore, useMemoFirebase } from '@/firebase';
-import { collection, limit, orderBy, query, doc } from 'firebase/firestore';
+import { collection, limit, orderBy, query, doc, where } from 'firebase/firestore';
+import { HeroCarousel } from '@/components/home/HeroCarousel';
 
 export default function HomePage() {
   const firestore = useFirestore();
@@ -19,6 +20,7 @@ export default function HomePage() {
   );
   const { data: settings } = useDoc<SiteSettings>(settingsRef);
   
+  // Fetch latest news
   const latestNewsQuery = useMemoFirebase(() => 
     firestore 
       ? query(collection(firestore, 'news_articles'), orderBy('createdAt', 'desc'), limit(3)) 
@@ -27,6 +29,15 @@ export default function HomePage() {
   );
   const { data: latestNews } = useCollection<NewsArticle>(latestNewsQuery);
 
+  // Fetch slider photos
+  const sliderPhotosQuery = useMemoFirebase(() => 
+    firestore 
+      ? query(collection(firestore, 'gallery_photos'), where('isSlider', '==', true)) 
+      : null,
+    [firestore]
+  );
+  const { data: sliderPhotos } = useCollection<GalleryPhoto>(sliderPhotosQuery);
+
   const finalSettings = settings || {
       tagline: 'Membangun Bersama, Sejahtera Bersama',
       headerImageUrl: 'https://picsum.photos/seed/header/1600/500',
@@ -34,20 +45,22 @@ export default function HomePage() {
       taglineColor: 'white',
   };
 
+  const carouselPhotos = sliderPhotos && sliderPhotos.length > 0
+    ? sliderPhotos
+    : [{
+        id: 'default-header-image',
+        name: finalSettings.tagline,
+        url: finalSettings.headerImageUrl,
+        isSlider: true,
+      }];
+
   return (
     <>
-      <section className="w-full">
-        <div className="relative w-full h-[30vh] md:h-[50vh] bg-muted">
-           <Image
-              src={finalSettings.headerImageUrl}
-              alt={finalSettings.tagline}
-              fill
-              className="object-cover"
-              priority
-              sizes="100vw"
-            />
-        </div>
-      </section>
+      <HeroCarousel 
+        photos={carouselPhotos} 
+        tagline={finalSettings.tagline} 
+        taglineColor={finalSettings.taglineColor} 
+      />
 
       <section className="py-16 lg:py-24">
         <div className="container">
