@@ -1,15 +1,13 @@
 'use client';
-import { HeroCarousel } from '@/components/home/HeroCarousel';
 import { NewsCard } from '@/components/berita/NewsCard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import type { GalleryPhoto, NewsArticle, SiteSettings } from '@/lib/types';
+import type { NewsArticle, SiteSettings } from '@/lib/types';
 import { ArrowRight, Info, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCollection, useDoc, useFirestore, useMemoFirebase } from '@/firebase';
-import { collection, limit, orderBy, query, where, doc } from 'firebase/firestore';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { collection, limit, orderBy, query, doc } from 'firebase/firestore';
 
 export default function HomePage() {
   const firestore = useFirestore();
@@ -21,15 +19,6 @@ export default function HomePage() {
   );
   const { data: settings } = useDoc<SiteSettings>(settingsRef);
   
-  // Fetch Slider Photos
-  const sliderPhotosQuery = useMemoFirebase(() => 
-    firestore 
-      ? query(collection(firestore, 'gallery_photos'), where('isSlider', '==', true), limit(5)) 
-      : null,
-    [firestore]
-  );
-  const { data: sliderPhotos } = useCollection<GalleryPhoto>(sliderPhotosQuery);
-
   const latestNewsQuery = useMemoFirebase(() => 
     firestore 
       ? query(collection(firestore, 'news_articles'), orderBy('createdAt', 'desc'), limit(3)) 
@@ -45,19 +34,21 @@ export default function HomePage() {
       taglineColor: 'white',
   };
 
-  const finalSliderPhotos: GalleryPhoto[] = (sliderPhotos && sliderPhotos.length > 0)
-    ? sliderPhotos
-    : [{
-        id: 'default-slider',
-        url: finalSettings.headerImageUrl,
-        isSlider: true,
-        name: 'Selamat Datang di Desa Batumarta 1'
-    }];
-
-
   return (
     <>
-      <HeroCarousel photos={finalSliderPhotos} tagline={finalSettings.tagline} taglineColor={finalSettings.taglineColor} />
+      <section className="w-full">
+        <div className="relative w-full h-[30vh] md:h-[50vh] bg-muted">
+           <Image
+              src={finalSettings.headerImageUrl}
+              alt={finalSettings.tagline}
+              fill
+              className="object-cover"
+              priority
+              sizes="100vw"
+            />
+        </div>
+      </section>
+
       <section className="py-16 lg:py-24">
         <div className="container">
           <div className="text-center max-w-3xl mx-auto">
