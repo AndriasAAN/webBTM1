@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Flower2, Mail, MapPin, Phone } from 'lucide-react';
+import { Mail, MapPin, Phone } from 'lucide-react';
 import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import type { SiteSettings } from '@/lib/types';
@@ -46,7 +46,6 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="flex flex-col items-center md:items-start">
                 <Link href="/" className="flex items-center gap-2 mb-4" passHref>
-                <Flower2 className="h-8 w-8 text-primary" />
                 <span className="font-bold text-xl">Desa Batumarta 1</span>
                 </Link>
                 <p className="text-muted-foreground text-center md:text-left max-w-xs">
