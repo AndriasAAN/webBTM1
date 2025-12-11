@@ -47,10 +47,9 @@ export default function GaleriPage() {
             <PhotoGrid photos={photos} />
           ) : (
              <div className="text-center py-16 border rounded-lg">
-              <h2 className="text-2xl font-semibold">Galeri Masih Kosong</h2>
-              <p className="mt-2 text-muted-foreground">
-                Saat ini belum ada foto yang diunggah. Silakan kembali lagi nanti.
-              </p>
+              <h2 className="text-2xl font-semibold uppercase text-destructive">
+                BELUM ADA FOTO PADA HALAMAN INI
+              </h2>
             </div>
           )}
         </div>
