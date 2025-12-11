@@ -15,8 +15,7 @@ export default function GaleriPage() {
   );
   const { data: photos, isLoading } = useCollection<GalleryPhoto>(photosQuery);
 
-  // While loading, loading.tsx will be shown.
-  // This component will only render when isLoading is false.
+  // loading.tsx handles the loading state
   if (isLoading) {
     return null;
   }
