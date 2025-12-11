@@ -38,6 +38,7 @@ export default function AdminTampilanPage() {
   const [tagline, setTagline] = useState('');
   const [themeColor, setThemeColor] = useState<ThemeColor>('light-pink');
   const [headerImageUrl, setHeaderImageUrl] = useState('');
+  const [taglineColor, setTaglineColor] = useState<'white' | 'black'>('white');
 
 
   useEffect(() => {
@@ -45,6 +46,7 @@ export default function AdminTampilanPage() {
       setTagline(currentSettings.tagline);
       setThemeColor(currentSettings.themeColor);
       setHeaderImageUrl(currentSettings.headerImageUrl);
+      setTaglineColor(currentSettings.taglineColor || 'white');
       // Apply the theme from DB on initial load
       document.body.className = `theme-${currentSettings.themeColor}`;
     } else {
@@ -73,6 +75,7 @@ export default function AdminTampilanPage() {
         tagline,
         themeColor,
         headerImageUrl,
+        taglineColor,
       };
 
       await setDoc(doc(firestore, 'website_settings', 'default'), settingsData, { merge: true });
@@ -120,6 +123,22 @@ export default function AdminTampilanPage() {
             <Input id="tagline" value={tagline} onChange={(e) => setTagline(e.target.value)} />
             <p className="text-sm text-muted-foreground">
               Tagline ini akan muncul di bawah slider halaman utama.
+            </p>
+          </div>
+
+           <div className="space-y-2">
+            <Label htmlFor="tagline-color">Warna Teks Tagline</Label>
+            <Select value={taglineColor} onValueChange={(value: 'white' | 'black') => setTaglineColor(value)}>
+              <SelectTrigger id="tagline-color">
+                <SelectValue placeholder="Pilih warna teks" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="white">Putih</SelectItem>
+                <SelectItem value="black">Hitam</SelectItem>
+              </SelectContent>
+            </Select>
+             <p className="text-sm text-muted-foreground">
+              Pilih warna yang paling kontras dengan gambar slider Anda.
             </p>
           </div>
 

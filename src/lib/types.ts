@@ -31,6 +31,7 @@ export interface SiteSettings {
   headerImageUrl: string;
   tagline: string;
   themeColor: ThemeColor;
+  taglineColor?: 'white' | 'black';
   address?: string;
   email?: string;
   phone?: string;

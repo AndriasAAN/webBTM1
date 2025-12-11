@@ -9,15 +9,17 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import type { GalleryPhoto } from '@/lib/types';
+import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import Autoplay from 'embla-carousel-autoplay';
 
 interface HeroCarouselProps {
   photos: GalleryPhoto[];
   tagline: string;
+  taglineColor?: 'white' | 'black';
 }
 
-export function HeroCarousel({ photos, tagline }: HeroCarouselProps) {
+export function HeroCarousel({ photos, tagline, taglineColor = 'white' }: HeroCarouselProps) {
   return (
     <section className="relative w-full h-[50vh] md:h-[calc(100vh-4rem)] overflow-hidden">
       <Carousel
@@ -45,10 +47,16 @@ export function HeroCarousel({ photos, tagline }: HeroCarouselProps) {
           ))}
         </CarouselContent>
         <div className="absolute bottom-12 md:bottom-20 left-1/2 -translate-x-1/2 z-10 text-center px-4">
-           <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-white drop-shadow-lg">
+           <h1 className={cn(
+             "text-3xl md:text-5xl lg:text-6xl font-extrabold tracking-tight drop-shadow-lg",
+             taglineColor === 'white' ? 'text-white' : 'text-black'
+           )}>
              {tagline}
            </h1>
-           <p className="mt-4 text-lg md:text-xl text-white/90 drop-shadow-md max-w-2xl mx-auto">
+           <p className={cn(
+             "mt-4 text-lg md:text-xl drop-shadow-md max-w-2xl mx-auto",
+             taglineColor === 'white' ? 'text-white/90' : 'text-gray-800/90'
+            )}>
              Website Resmi Desa Batumarta 1
            </p>
          </div>

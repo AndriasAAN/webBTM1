@@ -42,6 +42,7 @@ export default function HomePage() {
       tagline: 'Membangun Bersama, Sejahtera Bersama',
       headerImageUrl: 'https://picsum.photos/seed/header/1600/500',
       themeColor: 'light-pink',
+      taglineColor: 'white',
   };
 
   const finalSliderPhotos: GalleryPhoto[] = (sliderPhotos && sliderPhotos.length > 0)
@@ -56,7 +57,7 @@ export default function HomePage() {
 
   return (
     <>
-      <HeroCarousel photos={finalSliderPhotos} tagline={finalSettings.tagline} />
+      <HeroCarousel photos={finalSliderPhotos} tagline={finalSettings.tagline} taglineColor={finalSettings.taglineColor} />
       <section className="py-16 lg:py-24">
         <div className="container">
           <div className="text-center max-w-3xl mx-auto">
