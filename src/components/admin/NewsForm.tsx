@@ -78,23 +78,25 @@ export function NewsForm({ article }: NewsFormProps) {
     setIsLoading(true);
 
     try {
-        let finalThumbnailUrl = values.thumbnailUrl;
-        if (!finalThumbnailUrl) {
-            finalThumbnailUrl = 'https://images.unsplash.com/photo-1585241936939-be4099591252?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxuZXdzJTIwYXJ0aWNsZXxlbnwwfHx8fDE3NjUzMzM1MzN8MA&ixlib=rb-4.1.0&q=80&w=1080';
-        }
+        const finalThumbnailUrl = values.thumbnailUrl || 'https://picsum.photos/seed/news-default/1080/720';
 
         const articleData = {
             title: values.title,
             content: values.content,
             thumbnailUrl: finalThumbnailUrl,
             updatedAt: serverTimestamp(),
-            createdAt: values.createdAt, // Use date from form
+            createdAt: values.createdAt,
         };
 
         if (article) {
+            // Update existing document
             const docRef = doc(firestore, 'news_articles', article.id);
-            await setDoc(docRef, articleData, { merge: true });
+            await setDoc(docRef, {
+                ...articleData,
+                createdAt: article.createdAt // Preserve original creation date on update
+            }, { merge: true });
         } else {
+            // Create new document
             const collectionRef = collection(firestore, 'news_articles');
             await addDoc(collectionRef, articleData);
         }
