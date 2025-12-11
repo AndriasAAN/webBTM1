@@ -6,6 +6,7 @@ import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import type { SiteSettings } from '@/lib/types';
 import { Skeleton } from '../ui/skeleton';
+import { useEffect, useState } from 'react';
 
 function FooterSkeleton() {
     return (
@@ -30,6 +31,13 @@ export function Footer() {
     const firestore = useFirestore();
     const settingsRef = useMemoFirebase(() => firestore ? doc(firestore, 'website_settings', 'default') : null, [firestore]);
     const { data: settings, isLoading } = useDoc<SiteSettings>(settingsRef);
+    
+    // State to manage client-side rendering and avoid hydration mismatch
+    const [isClient, setIsClient] = useState(false);
+
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
 
     const address = settings?.address || 'Jl. Raya Batumarta, Kec. Lubuk Raja, Kab. OKU, Sumatera Selatan';
     const email = settings?.email || 'info@batumarta1.desa.id';
@@ -38,7 +46,7 @@ export function Footer() {
   return (
     <footer className="bg-muted">
       <div className="container py-12">
-        {isLoading ? (
+        {(!isClient || isLoading) ? (
             <FooterSkeleton />
         ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
