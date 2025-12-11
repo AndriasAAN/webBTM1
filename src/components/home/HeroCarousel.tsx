@@ -16,7 +16,7 @@ import Autoplay from 'embla-carousel-autoplay';
 interface HeroCarouselProps {
   photos: GalleryPhoto[];
   tagline: string;
-  taglineColor?: 'white' | 'black';
+  taglineColor?: string;
 }
 
 export function HeroCarousel({ photos, tagline, taglineColor = 'white' }: HeroCarouselProps) {
@@ -47,16 +47,16 @@ export function HeroCarousel({ photos, tagline, taglineColor = 'white' }: HeroCa
           ))}
         </CarouselContent>
         <div className="absolute bottom-12 md:bottom-20 left-1/2 -translate-x-1/2 z-10 text-center px-4">
-           <h1 className={cn(
-             "text-3xl md:text-5xl lg:text-6xl font-extrabold tracking-tight drop-shadow-lg",
-             taglineColor === 'white' ? 'text-white' : 'text-black'
-           )}>
+           <h1 
+             className="text-3xl md:text-5xl lg:text-6xl font-extrabold tracking-tight drop-shadow-lg"
+             style={{ color: taglineColor }}
+           >
              {tagline}
            </h1>
-           <p className={cn(
-             "mt-4 text-lg md:text-xl drop-shadow-md max-w-2xl mx-auto",
-             taglineColor === 'white' ? 'text-white/90' : 'text-gray-800/90'
-            )}>
+           <p 
+            className="mt-4 text-lg md:text-xl drop-shadow-md max-w-2xl mx-auto"
+            style={{ color: taglineColor, opacity: 0.9 }}
+           >
              Website Resmi Desa Batumarta 1
            </p>
          </div>

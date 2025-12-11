@@ -38,7 +38,7 @@ export default function AdminTampilanPage() {
   const [tagline, setTagline] = useState('');
   const [themeColor, setThemeColor] = useState<ThemeColor>('light-pink');
   const [headerImageUrl, setHeaderImageUrl] = useState('');
-  const [taglineColor, setTaglineColor] = useState<'white' | 'black'>('white');
+  const [taglineColor, setTaglineColor] = useState('white');
 
 
   useEffect(() => {
@@ -128,17 +128,9 @@ export default function AdminTampilanPage() {
 
            <div className="space-y-2">
             <Label htmlFor="tagline-color">Warna Teks Tagline</Label>
-            <Select value={taglineColor} onValueChange={(value: 'white' | 'black') => setTaglineColor(value)}>
-              <SelectTrigger id="tagline-color">
-                <SelectValue placeholder="Pilih warna teks" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="white">Putih</SelectItem>
-                <SelectItem value="black">Hitam</SelectItem>
-              </SelectContent>
-            </Select>
+            <Input id="tagline-color" value={taglineColor} onChange={(e) => setTaglineColor(e.target.value)} />
              <p className="text-sm text-muted-foreground">
-              Pilih warna yang paling kontras dengan gambar slider Anda.
+              Masukkan warna teks (contoh: `white`, `black`, `red`, atau kode hex `#ff0000`).
             </p>
           </div>
 
@@ -158,7 +150,7 @@ export default function AdminTampilanPage() {
                 </div>
             </div>
              <p className="text-sm text-muted-foreground">
-              Gambar ini akan menjadi gambar utama jika tidak ada foto yang ditandai sebagai 'slider'.
+              Gambar ini akan ditampilkan di antara slider dan teks selamat datang.
             </p>
           </div>
           
