@@ -128,9 +128,21 @@ export default function AdminTampilanPage() {
 
            <div className="space-y-2">
             <Label htmlFor="tagline-color">Warna Teks Tagline</Label>
-            <Input id="tagline-color" value={taglineColor} onChange={(e) => setTaglineColor(e.target.value)} />
+            <Select value={taglineColor} onValueChange={setTaglineColor}>
+              <SelectTrigger id="tagline-color">
+                <SelectValue placeholder="Pilih warna teks" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="white">Putih</SelectItem>
+                <SelectItem value="black">Hitam</SelectItem>
+                <SelectItem value="red">Merah</SelectItem>
+                <SelectItem value="blue">Biru</SelectItem>
+                <SelectItem value="green">Hijau</SelectItem>
+                <SelectItem value="yellow">Kuning</SelectItem>
+              </SelectContent>
+            </Select>
              <p className="text-sm text-muted-foreground">
-              Masukkan warna teks (contoh: `white`, `black`, `red`, atau kode hex `#ff0000`).
+              Pastikan warna teks kontras dengan gambar slider Anda.
             </p>
           </div>
 
