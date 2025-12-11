@@ -10,36 +10,7 @@ import Link from 'next/link';
 import { useCollection, useDoc, useFirestore, useMemoFirebase } from '@/firebase';
 import { collection, limit, orderBy, query, where, doc } from 'firebase/firestore';
 import { LatestNews } from '@/components/home/LatestNews';
-import { Skeleton } from '@/components/ui/skeleton';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-
-function HomePageSkeleton() {
-  return (
-    <>
-      <Skeleton className="w-full h-[50vh] md:h-[calc(100vh-4rem)]" />
-      <section className="py-16 lg:py-24">
-        <div className="container text-center max-w-3xl mx-auto">
-          <Skeleton className="h-10 md:h-14 w-3/4 mx-auto mb-4" />
-          <Skeleton className="h-10 md:h-14 w-1/2 mx-auto" />
-          <div className="mt-6 space-y-2">
-            <Skeleton className="h-5 w-full" />
-            <Skeleton className="h-5 w-5/6 mx-auto" />
-          </div>
-        </div>
-      </section>
-      <section className="bg-muted py-16 lg:py-24">
-        <div className="container">
-          <div className="text-center mb-12">
-            <Skeleton className="h-10 w-64 mx-auto mb-2" />
-            <Skeleton className="h-5 w-80 mx-auto" />
-          </div>
-          <LatestNews.Skeleton />
-        </div>
-      </section>
-    </>
-  );
-}
-
 
 export default function HomePage() {
   const firestore = useFirestore();
@@ -49,7 +20,7 @@ export default function HomePage() {
     firestore ? doc(firestore, 'website_settings', 'default') : null,
     [firestore]
   );
-  const { data: settings, isLoading: isSettingsLoading } = useDoc<SiteSettings>(settingsRef);
+  const { data: settings } = useDoc<SiteSettings>(settingsRef);
   
   // Fetch Slider Photos
   const sliderPhotosQuery = useMemoFirebase(() => 
@@ -58,7 +29,7 @@ export default function HomePage() {
       : null,
     [firestore]
   );
-  const { data: sliderPhotos, isLoading: isPhotosLoading } = useCollection<GalleryPhoto>(sliderPhotosQuery);
+  const { data: sliderPhotos } = useCollection<GalleryPhoto>(sliderPhotosQuery);
 
   const latestNewsQuery = useMemoFirebase(() => 
     firestore 
@@ -66,12 +37,8 @@ export default function HomePage() {
       : null,
     [firestore]
   );
-  const { data: latestNews, isLoading: isNewsLoading } = useCollection<NewsArticle>(latestNewsQuery);
+  const { data: latestNews } = useCollection<NewsArticle>(latestNewsQuery);
 
-  if (isSettingsLoading || isPhotosLoading) {
-      return <HomePageSkeleton />;
-  }
-  
   const finalSettings = settings || {
       tagline: 'Membangun Bersama, Sejahtera Bersama',
       headerImageUrl: PlaceHolderImages.find(p => p.id === 'default-header')?.imageUrl || 'https://picsum.photos/seed/header/1600/500',
@@ -114,9 +81,7 @@ export default function HomePage() {
               Ikuti perkembangan dan kegiatan terkini di Desa Batumarta 1.
             </p>
           </div>
-          {isNewsLoading ? (
-            <LatestNews.Skeleton />
-          ) : latestNews && latestNews.length > 0 ? (
+          {latestNews && latestNews.length > 0 ? (
              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {latestNews.map((article) => (
                 <NewsCard key={article.id} article={article} />

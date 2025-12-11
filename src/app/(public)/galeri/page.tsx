@@ -4,20 +4,6 @@ import { PhotoGrid } from '@/components/galeri/PhotoGrid';
 import type { GalleryPhoto } from '@/lib/types';
 import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
 import { collection, query, orderBy } from 'firebase/firestore';
-import { Skeleton } from '@/components/ui/skeleton';
-
-function GallerySkeleton() {
-  return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-      {Array.from({ length: 8 }).map((_, i) => (
-        <div key={i} className="space-y-2">
-            <Skeleton className="aspect-square w-full rounded-lg" />
-            <Skeleton className="h-4 w-3/4" />
-        </div>
-      ))}
-    </div>
-  )
-}
 
 export default function GaleriPage() {
   const firestore = useFirestore();
@@ -27,7 +13,7 @@ export default function GaleriPage() {
       : null,
     [firestore]
   );
-  const { data: photos, isLoading } = useCollection<GalleryPhoto>(photosQuery);
+  const { data: photos } = useCollection<GalleryPhoto>(photosQuery);
 
   return (
     <>
@@ -41,9 +27,7 @@ export default function GaleriPage() {
       </header>
       <main className="py-16">
         <div className="container">
-          {isLoading ? (
-            <GallerySkeleton />
-          ) : photos && photos.length > 0 ? (
+          {photos && photos.length > 0 ? (
             <PhotoGrid photos={photos} />
           ) : (
              <div className="text-center py-16 border rounded-lg">

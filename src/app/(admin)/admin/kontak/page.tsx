@@ -16,46 +16,14 @@ import { useToast } from '@/hooks/use-toast';
 import type { SiteSettings } from '@/lib/types';
 import { useFirebase, useDoc, useMemoFirebase } from '@/firebase';
 import { doc, setDoc } from 'firebase/firestore';
-import { Skeleton } from '@/components/ui/skeleton';
 
-function ContactFormSkeleton() {
-  return (
-     <div className="max-w-3xl space-y-8">
-        <div>
-            <Skeleton className="h-10 w-3/4 mb-2" />
-            <Skeleton className="h-5 w-1/2" />
-        </div>
-        <Card>
-            <CardHeader>
-                <Skeleton className="h-7 w-48 mb-2" />
-                <Skeleton className="h-5 w-72" />
-            </CardHeader>
-            <CardContent className="space-y-6">
-                <div className="space-y-2">
-                    <Skeleton className="h-5 w-24" />
-                    <Skeleton className="h-10 w-full" />
-                </div>
-                <div className="space-y-2">
-                    <Skeleton className="h-5 w-24" />
-                    <Skeleton className="h-10 w-full" />
-                </div>
-                <div className="space-y-2">
-                    <Skeleton className="h-5 w-24" />
-                    <Skeleton className="h-10 w-full" />
-                </div>
-            </CardContent>
-        </Card>
-        <Skeleton className="h-11 w-44" />
-     </div>
-  )
-}
 
 export default function AdminKontakPage() {
   const { toast } = useToast();
   const { firestore } = useFirebase();
 
   const settingsRef = useMemoFirebase(() => firestore ? doc(firestore, 'website_settings', 'default') : null, [firestore]);
-  const { data: currentSettings, isLoading: isLoadingSettings } = useDoc<SiteSettings>(settingsRef);
+  const { data: currentSettings } = useDoc<SiteSettings>(settingsRef);
 
   const [isSaving, setIsSaving] = useState(false);
   const [address, setAddress] = useState('');
@@ -103,10 +71,6 @@ export default function AdminKontakPage() {
       setIsSaving(false);
     }
   };
-
-  if (isLoadingSettings) {
-    return <ContactFormSkeleton />;
-  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8 max-w-3xl">

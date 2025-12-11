@@ -5,48 +5,22 @@ import { doc, getDoc, Timestamp } from 'firebase/firestore';
 import type { NewsArticle } from '@/lib/types';
 import { format } from 'date-fns';
 import { id as localeId } from 'date-fns/locale';
-import { Calendar, Clock, Loader2 } from 'lucide-react';
+import { Calendar, Clock } from 'lucide-react';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { useFirestore } from '@/firebase';
-import { Skeleton } from '@/components/ui/skeleton';
 
-
-function BeritaDetailSkeleton() {
-  return (
-     <div className="container max-w-4xl mx-auto py-12 md:py-20">
-        <header className="mb-8">
-            <Skeleton className="h-6 w-24 mb-4" />
-            <Skeleton className="h-10 md:h-14 w-full mb-2" />
-            <Skeleton className="h-10 md:h-14 w-3/4" />
-            <div className="mt-6 flex items-center space-x-4">
-                <Skeleton className="h-8 w-8 rounded-full" />
-                <Skeleton className="h-5 w-24" />
-                <Skeleton className="h-5 w-32" />
-            </div>
-        </header>
-        <Skeleton className="relative aspect-video rounded-xl mb-8 shadow-lg" />
-        <div className="space-y-4">
-            <Skeleton className="h-5 w-full" />
-            <Skeleton className="h-5 w-full" />
-            <Skeleton className="h-5 w-5/6" />
-        </div>
-    </div>
-  )
-}
 
 export default function BeritaDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = React.use(params);
   const firestore = useFirestore();
   const [article, setArticle] = useState<NewsArticle | null>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!firestore || !id) return;
 
     const fetchArticle = async () => {
-      setLoading(true);
       const docRef = doc(firestore, 'news_articles', id);
       const docSnap = await getDoc(docRef);
 
@@ -55,20 +29,16 @@ export default function BeritaDetailPage({ params }: { params: Promise<{ id: str
       } else {
         notFound();
       }
-      setLoading(false);
     };
 
     fetchArticle();
   }, [firestore, id]);
 
 
-  if (loading) {
-    return <BeritaDetailSkeleton />;
-  }
-
   if (!article) {
-    // This case should be handled by notFound() inside useEffect, but as a fallback
-    return notFound();
+    // Render nothing or a minimal placeholder until data is fetched,
+    // as the loading state is now handled by loading.tsx
+    return null;
   }
   
   const articleDate = (article.createdAt as Timestamp).toDate();

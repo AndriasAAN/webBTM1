@@ -43,27 +43,6 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useState } from 'react';
-import { NewsCard } from '@/components/berita/NewsCard';
-
-
-function NewsRowSkeleton() {
-  return (
-    <TableRow>
-      <TableCell className="hidden sm:table-cell">
-        <div className="aspect-square rounded-md bg-muted animate-pulse w-16 h-16"></div>
-      </TableCell>
-      <TableCell className="font-medium">
-        <div className="h-5 w-48 bg-muted animate-pulse rounded"></div>
-      </TableCell>
-      <TableCell className="hidden md:table-cell">
-        <div className="h-5 w-24 bg-muted animate-pulse rounded"></div>
-      </TableCell>
-      <TableCell>
-        <div className="h-8 w-8 bg-muted animate-pulse rounded-full"></div>
-      </TableCell>
-    </TableRow>
-  )
-}
 
 export default function AdminBeritaPage() {
   const firestore = useFirestore();
@@ -118,7 +97,7 @@ export default function AdminBeritaPage() {
         <CardHeader>
           <CardTitle>Daftar Berita</CardTitle>
           <CardDescription>
-            {isLoading ? 'Memuat berita...' : `Total ${newsData?.length || 0} artikel berita.`}
+            {`Total ${newsData?.length || 0} artikel berita.`}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -136,9 +115,7 @@ export default function AdminBeritaPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {isLoading ? (
-                Array.from({ length: 3 }).map((_, i) => <NewsRowSkeleton key={i} />)
-              ) : newsData && newsData.length > 0 ? (
+              {newsData && newsData.length > 0 ? (
                 newsData.map((article) => (
                 <TableRow key={article.id}>
                   <TableCell className="hidden sm:table-cell">

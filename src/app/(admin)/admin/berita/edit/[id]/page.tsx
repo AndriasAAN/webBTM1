@@ -8,31 +8,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
-import { Skeleton } from '@/components/ui/skeleton';
 import React from 'react';
-
-function EditBeritaSkeleton() {
-    return (
-        <div className="space-y-8">
-            <div className="flex items-center gap-4">
-                <Skeleton className="h-7 w-7 rounded-md" />
-                <div>
-                    <Skeleton className="h-9 w-48 mb-2" />
-                    <Skeleton className="h-5 w-72" />
-                </div>
-            </div>
-            <div className="grid md:grid-cols-3 gap-8">
-                <div className="md:col-span-2 space-y-6">
-                    <Skeleton className="h-[450px] w-full" />
-                </div>
-                <div className="space-y-6">
-                    <Skeleton className="h-[200px] w-full" />
-                    <Skeleton className="h-11 w-full" />
-                </div>
-            </div>
-        </div>
-    )
-}
 
 
 export default function EditBeritaPage({ params }: { params: Promise<{ id: string }> }) {
@@ -42,10 +18,6 @@ export default function EditBeritaPage({ params }: { params: Promise<{ id: strin
     const { data: article, isLoading, error } = useDoc<NewsArticle>(articleRef);
     const router = useRouter();
 
-
-    if (isLoading) {
-        return <EditBeritaSkeleton />;
-    }
 
     if (!article && !isLoading) {
         notFound();

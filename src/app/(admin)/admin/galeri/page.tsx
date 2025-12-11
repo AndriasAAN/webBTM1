@@ -37,28 +37,6 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-function GalleryRowSkeleton() {
-  return (
-    <TableRow>
-      <TableCell className="hidden sm:table-cell">
-        <div className="aspect-square rounded-md bg-muted animate-pulse w-16 h-16"></div>
-      </TableCell>
-      <TableCell>
-        <div className="h-5 w-40 bg-muted animate-pulse rounded"></div>
-      </TableCell>
-      <TableCell className="hidden md:table-cell">
-        <div className="h-5 w-24 bg-muted animate-pulse rounded"></div>
-      </TableCell>
-      <TableCell>
-        <div className="h-6 w-11 bg-muted animate-pulse rounded-full"></div>
-      </TableCell>
-       <TableCell>
-        <div className="h-8 w-8 bg-muted animate-pulse rounded-full"></div>
-      </TableCell>
-    </TableRow>
-  )
-}
-
 function AddPhotoDialog() {
     const { firestore } = useFirebase();
     const { toast } = useToast();
@@ -154,7 +132,7 @@ export default function AdminGaleriPage() {
   const { toast } = useToast();
 
   const photosCollectionRef = useMemoFirebase(() => firestore ? query(collection(firestore, 'gallery_photos'), orderBy('createdAt', 'desc')) : null, [firestore]);
-  const { data: photos, isLoading } = useCollection<GalleryPhoto>(photosCollectionRef);
+  const { data: photos } = useCollection<GalleryPhoto>(photosCollectionRef);
 
   const [photoToDelete, setPhotoToDelete] = useState<GalleryPhoto | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -216,7 +194,7 @@ export default function AdminGaleriPage() {
         <CardHeader>
           <CardTitle>Daftar Foto</CardTitle>
           <CardDescription>
-            {isLoading ? "Memuat foto..." : `Total ${photos?.length || 0} foto di galeri.`}
+            {`Total ${photos?.length || 0} foto di galeri.`}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -235,9 +213,7 @@ export default function AdminGaleriPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {isLoading ? (
-                 Array.from({ length: 4 }).map((_, i) => <GalleryRowSkeleton key={i} />)
-              ) : photos && photos.length > 0 ? (
+              {photos && photos.length > 0 ? (
                 photos.map((photo) => (
                     <TableRow key={photo.id}>
                     <TableCell className="hidden sm:table-cell">

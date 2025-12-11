@@ -16,7 +16,6 @@ import { useToast } from '@/hooks/use-toast';
 import type { ProfileSettings, Official } from '@/lib/types';
 import { useFirebase, useDoc, useMemoFirebase } from '@/firebase';
 import { doc, setDoc } from 'firebase/firestore';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
 import Image from 'next/image';
 
@@ -26,44 +25,12 @@ const DEFAULT_OFFICIALS: Official[] = [
   { name: 'Bapak Bendahara', role: 'Bendahara Desa', imageUrl: 'https://picsum.photos/seed/profile-treasurer/400/400', hint: 'person portrait' },
 ];
 
-function ProfileFormSkeleton() {
-  return (
-     <div className="max-w-4xl space-y-8">
-        <div>
-            <Skeleton className="h-10 w-3/4 mb-2" />
-            <Skeleton className="h-5 w-1/2" />
-        </div>
-        <Card>
-            <CardHeader>
-                <Skeleton className="h-7 w-48 mb-2" />
-            </CardHeader>
-            <CardContent className="space-y-6">
-                <Skeleton className="h-24 w-full" />
-                <Skeleton className="h-24 w-full" />
-                <Skeleton className="h-24 w-full" />
-            </CardContent>
-        </Card>
-        <Card>
-            <CardHeader>
-                <Skeleton className="h-7 w-56 mb-2" />
-            </CardHeader>
-            <CardContent className="grid md:grid-cols-3 gap-6">
-                <Skeleton className="h-48 w-full" />
-                <Skeleton className="h-48 w-full" />
-                <Skeleton className="h-48 w-full" />
-            </CardContent>
-        </Card>
-        <Skeleton className="h-11 w-44" />
-     </div>
-  )
-}
-
 export default function AdminProfilPage() {
   const { toast } = useToast();
   const { firestore } = useFirebase();
 
   const settingsRef = useMemoFirebase(() => firestore ? doc(firestore, 'website_settings', 'profile') : null, [firestore]);
-  const { data: currentSettings, isLoading: isLoadingSettings } = useDoc<ProfileSettings>(settingsRef);
+  const { data: currentSettings } = useDoc<ProfileSettings>(settingsRef);
 
   const [isSaving, setIsSaving] = useState(false);
   const [history, setHistory] = useState('');
@@ -120,9 +87,6 @@ export default function AdminProfilPage() {
     }
   };
 
-  if (isLoadingSettings) {
-    return <ProfileFormSkeleton />;
-  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8 max-w-4xl">
@@ -199,5 +163,3 @@ export default function AdminProfilPage() {
     </form>
   );
 }
-
-    

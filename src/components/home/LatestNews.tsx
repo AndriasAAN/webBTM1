@@ -5,6 +5,23 @@ import type { NewsArticle } from '@/lib/types';
 import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
 import { collection, query, orderBy, limit } from 'firebase/firestore';
 
+export function LatestNewsSkeleton() {
+  return (
+    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {Array.from({ length: 3 }).map((_, i) => (
+        <div key={i} className="flex flex-col space-y-3">
+          <Skeleton className="h-[250px] w-full rounded-xl" />
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-1/4" />
+            <Skeleton className="h-6 w-full" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-3/4" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
 
 export function LatestNews() {
   const firestore = useFirestore();
@@ -17,7 +34,7 @@ export function LatestNews() {
   const { data: latestNews, isLoading } = useCollection<NewsArticle>(latestNewsQuery);
 
   if (isLoading) {
-    return <LatestNews.Skeleton />;
+    return <LatestNewsSkeleton />;
   }
 
   if (!latestNews || latestNews.length === 0) {
@@ -40,20 +57,4 @@ export function LatestNews() {
   );
 }
 
-LatestNews.Skeleton = function LatestNewsSkeleton() {
-  return (
-    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {Array.from({ length: 3 }).map((_, i) => (
-        <div key={i} className="flex flex-col space-y-3">
-          <Skeleton className="h-[250px] w-full rounded-xl" />
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-1/4" />
-            <Skeleton className="h-6 w-full" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-3/4" />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-};
+LatestNews.Skeleton = LatestNewsSkeleton;

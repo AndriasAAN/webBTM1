@@ -4,13 +4,12 @@ import { Button } from '@/components/ui/button';
 import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
 import type { NewsArticle } from '@/lib/types';
 import { collection, query, orderBy } from 'firebase/firestore';
-import { LatestNews } from '@/components/home/LatestNews';
 
 
 export default function BeritaPage() {
   const firestore = useFirestore();
   const newsCollectionRef = useMemoFirebase(() => firestore ? query(collection(firestore, 'news_articles'), orderBy('createdAt', 'desc')) : null, [firestore]);
-  const { data: allNews, isLoading } = useCollection<NewsArticle>(newsCollectionRef);
+  const { data: allNews } = useCollection<NewsArticle>(newsCollectionRef);
 
 
   return (
@@ -25,9 +24,7 @@ export default function BeritaPage() {
       </header>
       <main className="py-16">
         <div className="container">
-          {isLoading ? (
-            <LatestNews.Skeleton />
-          ) : allNews && allNews.length > 0 ? (
+          {allNews && allNews.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {allNews.map((article) => (
                 <NewsCard key={article.id} article={article} />
