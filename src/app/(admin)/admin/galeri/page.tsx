@@ -178,11 +178,6 @@ export default function AdminGaleriPage() {
     }
   }
 
-  // loading.tsx handles the main loading state
-  if (isLoading) {
-      return null;
-  }
-
   return (
     <div className="space-y-8">
        <div className="flex items-center justify-between">
@@ -292,3 +287,5 @@ export default function AdminGaleriPage() {
     </div>
   );
 }
+
+    
