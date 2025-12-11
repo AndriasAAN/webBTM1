@@ -36,7 +36,6 @@ import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useRouter } from 'next/navigation';
 
 function AddPhotoDialog() {
     const { firestore } = useFirebase();
@@ -45,7 +44,6 @@ function AddPhotoDialog() {
     const [isSaving, setIsSaving] = useState(false);
     const [name, setName] = useState('');
     const [url, setUrl] = useState('');
-    const router = useRouter();
 
     const handleSave = async () => {
         if (!firestore || !name || !url) {
@@ -72,7 +70,6 @@ function AddPhotoDialog() {
             setName('');
             setUrl('');
             setOpen(false);
-            router.refresh();
         } catch (error) {
             console.error("Error adding photo: ", error);
             toast({
@@ -133,7 +130,6 @@ function AddPhotoDialog() {
 export default function AdminGaleriPage() {
   const { firestore } = useFirebase();
   const { toast } = useToast();
-  const router = useRouter();
 
   const photosCollectionRef = useMemoFirebase(() => firestore ? query(collection(firestore, 'gallery_photos'), orderBy('createdAt', 'desc')) : null, [firestore]);
   const { data: photos, isLoading } = useCollection<GalleryPhoto>(photosCollectionRef);
@@ -150,7 +146,6 @@ export default function AdminGaleriPage() {
         title: 'Status Slider Diperbarui',
         description: `Foto "${photo.name}" telah diperbarui.`
       });
-      router.refresh();
     } catch (error) {
        console.error("Error updating slider status: ", error);
        toast({
@@ -170,7 +165,6 @@ export default function AdminGaleriPage() {
         title: 'Foto Dihapus',
         description: `Foto "${photoToDelete.name}" telah dihapus dari galeri.`
       });
-      router.refresh(); // Refresh the page to show the updated list
     } catch (error) {
        console.error("Error deleting photo: ", error);
        toast({
