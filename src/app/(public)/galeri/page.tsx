@@ -13,7 +13,13 @@ export default function GaleriPage() {
       : null,
     [firestore]
   );
-  const { data: photos } = useCollection<GalleryPhoto>(photosQuery);
+  const { data: photos, isLoading } = useCollection<GalleryPhoto>(photosQuery);
+
+  // While loading, loading.tsx will be shown.
+  // This component will only render when isLoading is false.
+  if (isLoading) {
+    return null;
+  }
 
   return (
     <>
