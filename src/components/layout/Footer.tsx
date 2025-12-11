@@ -9,7 +9,7 @@ import { Skeleton } from '../ui/skeleton';
 
 function FooterSkeleton() {
     return (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="flex flex-col items-center md:items-start">
                  <Skeleton className="h-8 w-48 mb-4" />
                  <Skeleton className="h-5 w-56" />
@@ -22,14 +22,6 @@ function FooterSkeleton() {
                     <Skeleton className="h-5 w-1/2" />
                 </div>
             </div>
-             <div className="text-center md:text-left">
-                <Skeleton className="h-7 w-32 mb-4" />
-                <div className="space-y-2">
-                    <Skeleton className="h-5 w-24" />
-                    <Skeleton className="h-5 w-24" />
-                    <Skeleton className="h-5 w-24" />
-                </div>
-             </div>
         </div>
     )
 }
@@ -47,7 +39,7 @@ export function Footer() {
     <footer className="bg-muted">
       <div className="container py-12">
         {isLoading ? <FooterSkeleton /> : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="flex flex-col items-center md:items-start">
                 <Link href="/" className="flex items-center gap-2 mb-4" passHref>
                 <Flower2 className="h-8 w-8 text-primary" />
@@ -72,14 +64,6 @@ export function Footer() {
                     <Phone className="h-5 w-5 text-primary" />
                     <a href={`tel:${phone.replace(/\s|-/g, '')}`} className="hover:text-primary transition-colors">{phone}</a>
                 </li>
-                </ul>
-            </div>
-            <div className="text-center md:text-left">
-                <h3 className="font-semibold text-lg mb-4">Tautan Cepat</h3>
-                <ul className="space-y-2 text-muted-foreground">
-                    <li><Link href="/berita" className="hover:text-primary transition-colors">Berita</Link></li>
-                    <li><Link href="/galeri" className="hover:text-primary transition-colors">Galeri</Link></li>
-                    <li><Link href="/profil-desa" className="hover:text-primary transition-colors">Profil Desa</Link></li>
                 </ul>
             </div>
             </div>
