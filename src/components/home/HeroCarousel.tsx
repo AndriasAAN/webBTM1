@@ -45,7 +45,7 @@ export function HeroCarousel({ photos, tagline }: HeroCarouselProps) {
           ))}
         </CarouselContent>
         <div className="absolute bottom-12 md:bottom-20 left-1/2 -translate-x-1/2 z-10 text-center px-4">
-           <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-sky-500 drop-shadow-lg">
+           <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-white drop-shadow-lg">
              {tagline}
            </h1>
            <p className="mt-4 text-lg md:text-xl text-white/90 drop-shadow-md max-w-2xl mx-auto">

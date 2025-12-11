@@ -5,9 +5,6 @@ import Image from 'next/image';
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
 } from '@/components/ui/dialog';
 import { Card, CardContent } from '@/components/ui/card';
 import type { GalleryPhoto } from '@/lib/types';
@@ -51,10 +48,6 @@ export function PhotoGrid({ photos }: PhotoGridProps) {
       <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
         <DialogContent className="max-w-4xl p-2 bg-transparent border-none shadow-none">
           {selectedImage && (
-            <>
-            <DialogHeader className="p-4 absolute bottom-0 left-0 z-10 w-full bg-gradient-to-t from-black/80 to-transparent">
-                <DialogTitle className="text-white drop-shadow-md">{selectedImage.name}</DialogTitle>
-            </DialogHeader>
             <div className="relative aspect-video w-full h-auto">
                 <Image
                     src={selectedImage.url}
@@ -62,8 +55,10 @@ export function PhotoGrid({ photos }: PhotoGridProps) {
                     fill
                     className="object-contain"
                 />
+                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                    <p className="text-white text-lg font-bold drop-shadow-md">{selectedImage.name}</p>
+                </div>
             </div>
-            </>
           )}
         </DialogContent>
       </Dialog>

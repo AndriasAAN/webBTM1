@@ -132,7 +132,7 @@ export default function AdminGaleriPage() {
   const { toast } = useToast();
 
   const photosCollectionRef = useMemoFirebase(() => firestore ? query(collection(firestore, 'gallery_photos'), orderBy('createdAt', 'desc')) : null, [firestore]);
-  const { data: photos } = useCollection<GalleryPhoto>(photosCollectionRef);
+  const { data: photos, isLoading } = useCollection<GalleryPhoto>(photosCollectionRef);
 
   const [photoToDelete, setPhotoToDelete] = useState<GalleryPhoto | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -178,6 +178,10 @@ export default function AdminGaleriPage() {
     }
   }
 
+  // loading.tsx handles the main loading state
+  if (isLoading) {
+      return null;
+  }
 
   return (
     <div className="space-y-8">

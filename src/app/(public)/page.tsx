@@ -9,7 +9,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useCollection, useDoc, useFirestore, useMemoFirebase } from '@/firebase';
 import { collection, limit, orderBy, query, where, doc } from 'firebase/firestore';
-import { LatestNews } from '@/components/home/LatestNews';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 export default function HomePage() {
@@ -41,17 +40,16 @@ export default function HomePage() {
 
   const finalSettings = settings || {
       tagline: 'Membangun Bersama, Sejahtera Bersama',
-      headerImageUrl: PlaceHolderImages.find(p => p.id === 'default-header')?.imageUrl || 'https://picsum.photos/seed/header/1600/500',
+      headerImageUrl: 'https://picsum.photos/seed/header/1600/500',
       themeColor: 'light-pink',
   };
 
-  const finalSliderPhotos = sliderPhotos && sliderPhotos.length > 0
+  const finalSliderPhotos: GalleryPhoto[] = (sliderPhotos && sliderPhotos.length > 0)
     ? sliderPhotos
     : [{
         id: 'default-slider',
         url: finalSettings.headerImageUrl,
         isSlider: true,
-        createdAt: new Date(),
         name: 'Selamat Datang di Desa Batumarta 1'
     }];
 
@@ -128,7 +126,7 @@ export default function HomePage() {
                   <Card className="transform -rotate-2 hover:rotate-0 transition-transform">
                       <CardContent className="p-4">
                         <Image 
-                          src={PlaceHolderImages.find(p => p.id === 'gallery-5')?.imageUrl!} 
+                          src={"https://picsum.photos/seed/office/600/400"} 
                           alt="Kantor Desa" 
                           width={600} 
                           height={400} 
