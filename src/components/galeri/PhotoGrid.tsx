@@ -5,6 +5,8 @@ import Image from 'next/image';
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import { Card, CardContent } from '@/components/ui/card';
 import type { GalleryPhoto } from '@/lib/types';
@@ -50,17 +52,23 @@ export function PhotoGrid({ photos }: PhotoGridProps) {
       <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
         <DialogContent className="max-w-4xl p-2 bg-transparent border-none shadow-none">
           {selectedImage && (
-            <div className="relative aspect-video w-full h-auto">
-                <Image
-                    src={selectedImage.url}
-                    alt={selectedImage.name || 'Selected gallery photo'}
-                    fill
-                    className="object-contain"
-                />
-                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-                    <p className="text-white text-lg font-bold drop-shadow-md">{selectedImage.name}</p>
+            <>
+                <DialogTitle className="sr-only">{selectedImage.name}</DialogTitle>
+                <DialogDescription className="sr-only">
+                    Gambar {selectedImage.name} dalam tampilan yang lebih besar.
+                </DialogDescription>
+                <div className="relative aspect-video w-full h-auto">
+                    <Image
+                        src={selectedImage.url}
+                        alt={selectedImage.name || 'Selected gallery photo'}
+                        fill
+                        className="object-contain"
+                    />
+                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                        <p className="text-white text-lg font-bold drop-shadow-md">{selectedImage.name}</p>
+                    </div>
                 </div>
-            </div>
+            </>
           )}
         </DialogContent>
       </Dialog>
