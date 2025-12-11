@@ -5,7 +5,6 @@ import { Flower2, Mail, MapPin, Phone } from 'lucide-react';
 import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import type { SiteSettings } from '@/lib/types';
-import { Skeleton } from '../ui/skeleton';
 import { useEffect, useState } from 'react';
 
 export function Footer() {
@@ -25,25 +24,16 @@ export function Footer() {
     const phone = settings?.phone || '+62 123-456-789';
     
     if (!isClient) {
+        // Render a placeholder or null on the server to prevent mismatch
         return (
             <footer className="bg-muted">
                 <div className="container py-8">
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div className="flex flex-col items-center md:items-start">
-                            <Skeleton className="h-8 w-48 mb-4">&nbsp;</Skeleton>
-                            <Skeleton className="h-5 w-56">&nbsp;</Skeleton>
-                        </div>
-                        <div className="text-center md:text-left">
-                            <h3 className="font-semibold text-lg mb-4">Kontak Kami</h3>
-                            <div className="space-y-3">
-                                <Skeleton className="h-5 w-full">&nbsp;</Skeleton>
-                                <Skeleton className="h-5 w-3/4">&nbsp;</Skeleton>
-                                <Skeleton className="h-5 w-1/2">&nbsp;</Skeleton>
-                            </div>
-                        </div>
+                        <div>&nbsp;</div>
+                        <div>&nbsp;</div>
                     </div>
                     <div className="mt-8 border-t pt-6 text-center text-sm text-muted-foreground">
-                        <Skeleton className="h-5 w-64 mx-auto">&nbsp;</Skeleton>
+                        &nbsp;
                     </div>
                 </div>
             </footer>
