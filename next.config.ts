@@ -58,6 +58,12 @@ const nextConfig: NextConfig = {
         hostname: 'beritas3.com',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'siberindo.co',
+        port: '',
+        pathname: '/**',
       }
     ],
   },
