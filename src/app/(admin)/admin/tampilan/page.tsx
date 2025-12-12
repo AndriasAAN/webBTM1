@@ -39,6 +39,7 @@ export default function AdminTampilanPage() {
   const [themeColor, setThemeColor] = useState<ThemeColor>('light-pink');
   const [headerImageUrl, setHeaderImageUrl] = useState('');
   const [taglineColor, setTaglineColor] = useState('white');
+  const [profileSectionImageUrl, setProfileSectionImageUrl] = useState('');
 
 
   useEffect(() => {
@@ -47,6 +48,7 @@ export default function AdminTampilanPage() {
       setThemeColor(currentSettings.themeColor);
       setHeaderImageUrl(currentSettings.headerImageUrl);
       setTaglineColor(currentSettings.taglineColor || 'white');
+      setProfileSectionImageUrl(currentSettings.profileSectionImageUrl || '');
     }
   }, [currentSettings]);
   
@@ -73,6 +75,7 @@ export default function AdminTampilanPage() {
         themeColor,
         headerImageUrl,
         taglineColor,
+        profileSectionImageUrl,
       };
 
       await setDoc(doc(firestore, 'website_settings', 'default'), settingsData, { merge: true });
@@ -160,6 +163,26 @@ export default function AdminTampilanPage() {
             </div>
              <p className="text-sm text-muted-foreground">
               Gambar ini akan ditampilkan di antara slider dan teks selamat datang.
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="profile-section-image-url">URL Gambar Bagian Profil</Label>
+            <Input id="profile-section-image-url" value={profileSectionImageUrl} onChange={(e) => setProfileSectionImageUrl(e.target.value)} placeholder="https://..." />
+             <div className="mt-2 border-2 border-dashed rounded-lg p-4 bg-muted">
+                <div className="w-full aspect-video relative flex items-center justify-center">
+                {profileSectionImageUrl ? (
+                    <Image src={profileSectionImageUrl} alt="Preview" layout="fill" className="object-contain rounded-md" />
+                ) : (
+                    <div className="text-center text-muted-foreground">
+                        <ImageIcon className="mx-auto h-10 w-10"/>
+                        <p className="text-sm mt-2">Pratinjau gambar akan muncul di sini</p>
+                    </div>
+                )}
+                </div>
+            </div>
+             <p className="text-sm text-muted-foreground">
+              Gambar ini akan ditampilkan di bagian "Profil Desa" pada halaman utama.
             </p>
           </div>
           

@@ -37,6 +37,7 @@ export interface SiteSettings {
   address?: string;
   email?: string;
   phone?: string;
+  profileSectionImageUrl?: string;
 }
 
 export interface Official {

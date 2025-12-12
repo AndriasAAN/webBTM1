@@ -43,6 +43,7 @@ export default function HomePage() {
       headerImageUrl: 'https://picsum.photos/seed/header/1600/500',
       themeColor: 'light-pink',
       taglineColor: 'white',
+      profileSectionImageUrl: 'https://picsum.photos/seed/office/600/400'
   };
 
   const carouselPhotos = sliderPhotos && sliderPhotos.length > 0
@@ -147,7 +148,7 @@ export default function HomePage() {
                   <Card className="transform -rotate-2 hover:rotate-0 transition-transform">
                       <CardContent className="p-4">
                         <Image 
-                          src={"https://picsum.photos/seed/office/600/400"} 
+                          src={finalSettings.profileSectionImageUrl || "https://picsum.photos/seed/office/600/400"} 
                           alt="Kantor Desa" 
                           width={600} 
                           height={400} 
