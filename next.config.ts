@@ -43,6 +43,12 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'okutimurpos.disway.id',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
         hostname: 'storage.googleapis.com',
         port: '',
         pathname: '/**',
