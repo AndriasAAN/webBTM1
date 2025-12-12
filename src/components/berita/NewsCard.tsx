@@ -2,16 +2,18 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
 import type { NewsArticle } from '@/lib/types';
 import Image from 'next/image';
 import Link from 'next/link';
-import { CalendarDays } from 'lucide-react';
+import { ArrowRight, CalendarDays } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { Timestamp } from 'firebase/firestore';
+import { Button } from '../ui/button';
 
 interface NewsCardProps {
   article: NewsArticle;
@@ -32,13 +34,16 @@ export function NewsCard({ article }: NewsCardProps) {
 
   const excerpt = article.content.substring(0, 100) + (article.content.length > 100 ? '...' : '');
 
+  // Membersihkan URL gambar dari garis miring ganda
+  const cleanedThumbnailUrl = article.thumbnailUrl.replace(/(?<!:)\/\/+/g, '/');
+
   return (
     <Card className="flex flex-col h-full overflow-hidden transition-transform transform hover:-translate-y-2 hover:shadow-xl">
-      <Link href={`/berita/${article.id}`} className="block h-full">
+      <Link href={`/berita/${article.id}`} className="block h-full flex flex-col">
         <CardHeader className="p-0">
           <div className="aspect-video relative">
             <Image
-              src={article.thumbnailUrl}
+              src={cleanedThumbnailUrl}
               alt={article.title}
               fill
               className="object-cover"
@@ -56,6 +61,7 @@ export function NewsCard({ article }: NewsCardProps) {
           </CardTitle>
           <CardDescription>{excerpt}</CardDescription>
         </CardContent>
+        {/* CardFooter dihilangkan sesuai permintaan sebelumnya */}
       </Link>
     </Card>
   );
