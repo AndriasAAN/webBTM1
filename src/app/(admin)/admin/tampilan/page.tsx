@@ -202,6 +202,9 @@ export default function AdminTampilanPage() {
                 <SelectItem value="elegant-purple">Ungu Elegan</SelectItem>
                 <SelectItem value="forest-green">Hijau Hutan</SelectItem>
                 <SelectItem value="deep-purple">Ungu Pekat</SelectItem>
+                <SelectItem value="ruby-red">Merah Delima</SelectItem>
+                <SelectItem value="golden-yellow">Kuning Emas</SelectItem>
+                <SelectItem value="slate-gray">Abu-abu Modern</SelectItem>
               </SelectContent>
             </Select>
             <p className="text-sm text-muted-foreground">

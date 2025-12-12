@@ -23,7 +23,6 @@
     --border: 330 100% 92%;
     --input: 330 100% 92%;
     --ring: 340 82% 52%;
-    --radius: 0.8rem;
     --chart-1: 340 82% 52%;
     --chart-2: 329 100% 75%;
     --chart-3: 330 100% 85%;
@@ -205,6 +204,72 @@
     --border: 270 50% 93%;
     --input: 270 50% 93%;
     --ring: 270 65% 50%;
+  }
+
+  .theme-ruby-red {
+    --background: 0 100% 98%;
+    --foreground: 0 40% 20%;
+    --card: 0 100% 100%;
+    --card-foreground: 0 40% 20%;
+    --popover: 0 100% 100%;
+    --popover-foreground: 0 40% 20%;
+    --primary: 0 72% 51%; /* Strong red */
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 100% 94%;
+    --secondary-foreground: 0 72% 51%;
+    --muted: 0 100% 97%;
+    --muted-foreground: 0 25% 50%;
+    --accent: 0 100% 92%;
+    --accent-foreground: 0 72% 51%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 100% 93%;
+    --input: 0 100% 93%;
+    --ring: 0 72% 51%;
+  }
+
+  .theme-golden-yellow {
+    --background: 45 100% 97%;
+    --foreground: 45 50% 20%;
+    --card: 45 100% 100%;
+    --card-foreground: 45 50% 20%;
+    --popover: 45 100% 100%;
+    --popover-foreground: 45 50% 20%;
+    --primary: 45 100% 50%; /* Bright gold */
+    --primary-foreground: 45 50% 10%;
+    --secondary: 45 100% 92%;
+    --secondary-foreground: 45 100% 50%;
+    --muted: 45 100% 96%;
+    --muted-foreground: 45 20% 45%;
+    --accent: 45 100% 90%;
+    --accent-foreground: 45 100% 50%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 45 100% 91%;
+    --input: 45 100% 91%;
+    --ring: 45 100% 50%;
+  }
+
+  .theme-slate-gray {
+    --background: 220 13% 95%;
+    --foreground: 220 13% 10%;
+    --card: 220 13% 100%;
+    --card-foreground: 220 13% 10%;
+    --popover: 220 13% 100%;
+    --popover-foreground: 220 13% 10%;
+    --primary: 220 14% 46%; /* Mid-gray */
+    --primary-foreground: 220 13% 98%;
+    --secondary: 220 13% 90%;
+    --secondary-foreground: 220 14% 20%;
+    --muted: 220 13% 93%;
+    --muted-foreground: 220 9% 40%;
+    --accent: 220 13% 88%;
+    --accent-foreground: 220 14% 10%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 13% 85%;
+    --input: 220 13% 85%;
+    --ring: 220 14% 46%;
   }
  
   .dark {
